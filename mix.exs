@@ -65,7 +65,9 @@ defmodule App.MixProject do
       {:gettext, "~> 1.0"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.2.0"},
-      {:bandit, "~> 1.5"}
+      {:bandit, "~> 1.5"},
+      {:pyre, git: "https://github.com/chrislaskey/pyre", branch: "main"},
+      {:pyre_web, git: "https://github.com/chrislaskey/pyre_web", branch: "main"},
     ]
   end
 
