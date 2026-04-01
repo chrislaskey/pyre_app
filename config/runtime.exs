@@ -32,7 +32,7 @@ if env!("PHX_SERVER", :string, nil) == "true" do
   config :app, AppWeb.Endpoint, server: true
 end
 
-config :app, AppWeb.Endpoint, http: [port: env!("PORT", :integer, 4004)]
+config :app, AppWeb.Endpoint, http: [port: env!("PORT", :integer, 4000)]
 
 # Pyre
 
