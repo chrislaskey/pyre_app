@@ -40,6 +40,7 @@ defmodule App.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      # Default phoenix deps
       {:phoenix, "~> 1.8.5"},
       {:phoenix_ecto, "~> 4.5"},
       {:ecto_sql, "~> 3.13"},
@@ -66,8 +67,13 @@ defmodule App.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.2.0"},
       {:bandit, "~> 1.5"},
+
+      # Pyre deps
       {:pyre, git: "https://github.com/chrislaskey/pyre", branch: "main"},
       {:pyre_web, git: "https://github.com/chrislaskey/pyre_web", branch: "main"},
+
+      # Additional deps
+      {:dotenvy, "~> 1.1.0"},
     ]
   end
 

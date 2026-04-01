@@ -1,6 +1,8 @@
 defmodule AppWeb.Router do
   use AppWeb, :router
 
+  import PyreWeb.Router
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -17,7 +19,13 @@ defmodule AppWeb.Router do
   scope "/", AppWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    get "/home", PageController, :home
+  end
+
+  scope "/" do
+    pipe_through :browser
+
+    pyre_web "/"
   end
 
   # Other scopes may use custom stacks.

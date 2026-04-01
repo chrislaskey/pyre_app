@@ -22,6 +22,33 @@ end
 
 config :app, AppWeb.Endpoint, http: [port: String.to_integer(System.get_env("PORT", "4004"))]
 
+# Pyre
+
+if System.get_env("PYRE_GITHUB_REPO_URL") do
+  config :pyre, :github,
+    repositories: [
+      [
+        url: System.get_env("PYRE_GITHUB_REPO_URL"),
+        token: System.get_env("PYRE_GITHUB_TOKEN"),
+        base_branch: System.get_env("PYRE_GITHUB_BASE_BRANCH", "main")
+      ],
+      # [
+      #   url: System.get_env("PYRE_ADDITIONAL_GITHUB_REPO_URL"),
+      #   token: System.get_env("PYRE_ADDITIONAL_GITHUB_TOKEN"),
+      #   base_branch: System.get_env("PYRE_ADDITIONAL_GITHUB_BASE_BRANCH", "main")
+      # ]
+    ]
+end
+
+if paths = System.get_env("PYRE_ALLOWED_PATHS") do
+  config :pyre,
+    allowed_paths:
+      paths
+      |> String.split(",", trim: true)
+      |> Enum.map(&String.trim/1)
+      |> Enum.map(&Path.expand/1)
+end
+
 if config_env() == :prod do
   database_path =
     System.get_env("DATABASE_PATH") ||

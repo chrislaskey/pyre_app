@@ -22,6 +22,19 @@ config :app, AppWeb.Endpoint,
   pubsub_server: App.PubSub,
   live_view: [signing_salt: "pXRLy6ce"]
 
+# Pyre
+
+config :pyre, :pubsub, App.PubSub
+
+# Jido
+
+config :jido_ai,
+  model_aliases: %{
+    fast: "anthropic:claude-haiku-4-5",
+    standard: "anthropic:claude-sonnet-4-20250514",
+    advanced: "anthropic:claude-opus-4-20250514"
+  }
+
 # Configure the mailer
 #
 # By default it uses the "Local" adapter which stores the emails
