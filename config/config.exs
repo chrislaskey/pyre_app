@@ -39,7 +39,7 @@ config :app, AppWeb.Endpoint,
 
 config :pyre, :pubsub, App.PubSub
 
-config :pyre, config: App.PyreConfig
+config :pyre, config: App.Pyre.Config
 
 # Jido
 
