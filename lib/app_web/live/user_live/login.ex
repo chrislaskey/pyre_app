@@ -109,10 +109,7 @@ defmodule AppWeb.UserLive.Login do
 
   def handle_event("submit_magic", %{"user" => %{"email" => email}}, socket) do
     if user = Accounts.get_user_by_email(email) do
-      Accounts.deliver_login_instructions(
-        user,
-        &url(~p"/users/log-in/#{&1}")
-      )
+      Accounts.deliver_login_instructions(user, url(~p"/users/log-in/code"))
     end
 
     info =
@@ -121,7 +118,8 @@ defmodule AppWeb.UserLive.Login do
     {:noreply,
      socket
      |> put_flash(:info, info)
-     |> push_navigate(to: ~p"/users/log-in")}
+     |> put_flash(:login_email, email)
+     |> push_navigate(to: ~p"/users/log-in/code")}
   end
 
   defp local_mail_adapter? do

@@ -76,13 +76,13 @@ defmodule AppWeb.UserSessionControllerTest do
     end
   end
 
-  describe "POST /users/log-in - magic link" do
+  describe "POST /users/log-in - login code" do
     test "logs the user in", %{conn: conn, user: user} do
-      {token, _hashed_token} = generate_user_magic_link_token(user)
+      {code, _hashed_code} = generate_user_login_code(user)
 
       conn =
         post(conn, ~p"/users/log-in", %{
-          "user" => %{"token" => token}
+          "user" => %{"code" => code, "email" => user.email}
         })
 
       assert get_session(conn, :user_token)
@@ -101,12 +101,12 @@ defmodule AppWeb.UserSessionControllerTest do
     end
 
     test "confirms unconfirmed user", %{conn: conn, unconfirmed_user: user} do
-      {token, _hashed_token} = generate_user_magic_link_token(user)
+      {code, _hashed_code} = generate_user_login_code(user)
       refute user.confirmed_at
 
       conn =
         post(conn, ~p"/users/log-in", %{
-          "user" => %{"token" => token},
+          "user" => %{"code" => code, "email" => user.email},
           "_action" => "confirmed"
         })
 
@@ -128,14 +128,14 @@ defmodule AppWeb.UserSessionControllerTest do
       assert response =~ ~p"/users/log-out"
     end
 
-    test "redirects to login page when magic link is invalid", %{conn: conn} do
+    test "redirects to login page when login code is invalid", %{conn: conn} do
       conn =
         post(conn, ~p"/users/log-in", %{
-          "user" => %{"token" => "invalid"}
+          "user" => %{"code" => "000000", "email" => "test@example.com"}
         })
 
       assert Phoenix.Flash.get(conn.assigns.flash, :error) ==
-               "The link is invalid or it has expired."
+               "The code is invalid or it has expired."
 
       assert redirected_to(conn) == ~p"/users/log-in"
     end

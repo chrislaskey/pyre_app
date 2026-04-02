@@ -13,8 +13,8 @@ defmodule AppWeb.UserLive.LoginTest do
     end
   end
 
-  describe "user login - magic link" do
-    test "sends magic link email when user exists", %{conn: conn} do
+  describe "user login - email code" do
+    test "sends login code email when user exists", %{conn: conn} do
       user = user_fixture()
 
       {:ok, lv, _html} = live(conn, ~p"/users/log-in")
@@ -22,7 +22,7 @@ defmodule AppWeb.UserLive.LoginTest do
       {:ok, _lv, html} =
         form(lv, "#login_form_magic", user: %{email: user.email})
         |> render_submit()
-        |> follow_redirect(conn, ~p"/users/log-in")
+        |> follow_redirect(conn, ~p"/users/log-in/code")
 
       assert html =~ "If your email is in our system"
 
@@ -36,7 +36,7 @@ defmodule AppWeb.UserLive.LoginTest do
       {:ok, _lv, html} =
         form(lv, "#login_form_magic", user: %{email: "idonotexist@example.com"})
         |> render_submit()
-        |> follow_redirect(conn, ~p"/users/log-in")
+        |> follow_redirect(conn, ~p"/users/log-in/code")
 
       assert html =~ "If your email is in our system"
     end

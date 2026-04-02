@@ -307,36 +307,40 @@ defmodule App.AccountsTest do
     end
   end
 
-  describe "get_user_by_magic_link_token/1" do
+  describe "get_user_by_login_code/2" do
     setup do
       user = user_fixture()
-      {encoded_token, _hashed_token} = generate_user_magic_link_token(user)
-      %{user: user, token: encoded_token}
+      {code, _hashed_code} = generate_user_login_code(user)
+      %{user: user, code: code}
     end
 
-    test "returns user by token", %{user: user, token: token} do
-      assert session_user = Accounts.get_user_by_magic_link_token(token)
+    test "returns user by code and email", %{user: user, code: code} do
+      assert session_user = Accounts.get_user_by_login_code(code, user.email)
       assert session_user.id == user.id
     end
 
-    test "does not return user for invalid token" do
-      refute Accounts.get_user_by_magic_link_token("oops")
+    test "does not return user for invalid code", %{user: user} do
+      refute Accounts.get_user_by_login_code("000000", user.email)
     end
 
-    test "does not return user for expired token", %{token: token} do
+    test "does not return user for wrong email", %{code: code} do
+      refute Accounts.get_user_by_login_code(code, "wrong@example.com")
+    end
+
+    test "does not return user for expired code", %{user: user, code: code} do
       {1, nil} = Repo.update_all(UserToken, set: [inserted_at: ~N[2020-01-01 00:00:00]])
-      refute Accounts.get_user_by_magic_link_token(token)
+      refute Accounts.get_user_by_login_code(code, user.email)
     end
   end
 
-  describe "login_user_by_magic_link/1" do
+  describe "login_user_by_login_code/2" do
     test "confirms user and expires tokens" do
       user = unconfirmed_user_fixture()
       refute user.confirmed_at
-      {encoded_token, hashed_token} = generate_user_magic_link_token(user)
+      {code, hashed_code} = generate_user_login_code(user)
 
-      assert {:ok, {user, [%{token: ^hashed_token}]}} =
-               Accounts.login_user_by_magic_link(encoded_token)
+      assert {:ok, {user, [%{token: ^hashed_code}]}} =
+               Accounts.login_user_by_login_code(code, user.email)
 
       assert user.confirmed_at
     end
@@ -344,19 +348,19 @@ defmodule App.AccountsTest do
     test "returns user and (deleted) token for confirmed user" do
       user = user_fixture()
       assert user.confirmed_at
-      {encoded_token, _hashed_token} = generate_user_magic_link_token(user)
-      assert {:ok, {^user, []}} = Accounts.login_user_by_magic_link(encoded_token)
+      {code, _hashed_code} = generate_user_login_code(user)
+      assert {:ok, {^user, []}} = Accounts.login_user_by_login_code(code, user.email)
       # one time use only
-      assert {:error, :not_found} = Accounts.login_user_by_magic_link(encoded_token)
+      assert {:error, :not_found} = Accounts.login_user_by_login_code(code, user.email)
     end
 
     test "raises when unconfirmed user has password set" do
       user = unconfirmed_user_fixture()
       {1, nil} = Repo.update_all(User, set: [hashed_password: "hashed"])
-      {encoded_token, _hashed_token} = generate_user_magic_link_token(user)
+      {code, _hashed_code} = generate_user_login_code(user)
 
-      assert_raise RuntimeError, ~r/magic link log in is not allowed/, fn ->
-        Accounts.login_user_by_magic_link(encoded_token)
+      assert_raise RuntimeError, ~r/login code log in is not allowed/, fn ->
+        Accounts.login_user_by_login_code(code, user.email)
       end
     end
   end
@@ -375,14 +379,14 @@ defmodule App.AccountsTest do
       %{user: unconfirmed_user_fixture()}
     end
 
-    test "sends token through notification", %{user: user} do
-      token =
-        extract_user_token(fn url ->
-          Accounts.deliver_login_instructions(user, url)
+    test "sends login code through notification", %{user: user} do
+      code =
+        extract_login_code(fn ->
+          Accounts.deliver_login_instructions(user, "http://localhost/users/log-in/code")
         end)
 
-      {:ok, token} = Base.url_decode64(token, padding: false)
-      assert user_token = Repo.get_by(UserToken, token: :crypto.hash(:sha256, token))
+      assert String.match?(code, ~r/^\d{6}$/)
+      assert user_token = Repo.get_by(UserToken, token: :crypto.hash(:sha256, code))
       assert user_token.user_id == user.id
       assert user_token.sent_to == user.email
       assert user_token.context == "login"

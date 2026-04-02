@@ -30,13 +30,13 @@ defmodule App.AccountsFixtures do
   def user_fixture(attrs \\ %{}) do
     user = unconfirmed_user_fixture(attrs)
 
-    token =
-      extract_user_token(fn url ->
-        Accounts.deliver_login_instructions(user, url)
+    code =
+      extract_login_code(fn ->
+        Accounts.deliver_login_instructions(user, "http://localhost/users/log-in/code")
       end)
 
     {:ok, {user, _expired_tokens}} =
-      Accounts.login_user_by_magic_link(token)
+      Accounts.login_user_by_login_code(code, user.email)
 
     user
   end
@@ -63,6 +63,12 @@ defmodule App.AccountsFixtures do
     token
   end
 
+  def extract_login_code(fun) do
+    {:ok, captured_email} = fun.()
+    [code] = Regex.run(~r/\b(\d{6})\b/, captured_email.text_body, capture: :first)
+    code
+  end
+
   def override_token_authenticated_at(token, authenticated_at) when is_binary(token) do
     App.Repo.update_all(
       from(t in Accounts.UserToken,
@@ -72,10 +78,10 @@ defmodule App.AccountsFixtures do
     )
   end
 
-  def generate_user_magic_link_token(user) do
-    {encoded_token, user_token} = Accounts.UserToken.build_email_token(user, "login")
+  def generate_user_login_code(user) do
+    {code, user_token} = Accounts.UserToken.build_login_code_token(user)
     App.Repo.insert!(user_token)
-    {encoded_token, user_token.token}
+    {code, user_token.token}
   end
 
   def offset_user_token(token, amount_to_add, unit) do

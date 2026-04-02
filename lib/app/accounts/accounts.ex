@@ -189,10 +189,10 @@ defmodule App.Accounts do
   end
 
   @doc """
-  Gets the user with the given magic link token.
+  Gets the user with the given login code and email.
   """
-  def get_user_by_magic_link_token(token) do
-    with {:ok, query} <- UserToken.verify_magic_link_token_query(token),
+  def get_user_by_login_code(code, email) do
+    with {:ok, query} <- UserToken.verify_login_code_query(code, email),
          {user, _token} <- Repo.one(query) do
       user
     else
@@ -201,12 +201,12 @@ defmodule App.Accounts do
   end
 
   @doc """
-  Logs the user in by magic link.
+  Logs the user in by login code.
 
   There are three cases to consider:
 
   1. The user has already confirmed their email. They are logged in
-     and the magic link is expired.
+     and the login code token is expired.
 
   2. The user has not confirmed their email and no password is set.
      In this case, the user gets confirmed, logged in, and all tokens -
@@ -218,14 +218,14 @@ defmodule App.Accounts do
      source of security pitfalls. See the "Mixing magic link and password registration" section of
      `mix help phx.gen.auth`.
   """
-  def login_user_by_magic_link(token) do
-    {:ok, query} = UserToken.verify_magic_link_token_query(token)
+  def login_user_by_login_code(code, email) do
+    {:ok, query} = UserToken.verify_login_code_query(code, email)
 
     case Repo.one(query) do
-      # Prevent session fixation attacks by disallowing magic links for unconfirmed users with password
+      # Prevent session fixation attacks by disallowing login codes for unconfirmed users with password
       {%User{confirmed_at: nil, hashed_password: hash}, _token} when not is_nil(hash) ->
         raise """
-        magic link log in is not allowed for unconfirmed users with a password set!
+        login code log in is not allowed for unconfirmed users with a password set!
 
         This cannot happen with the default implementation, which indicates that you
         might have adapted the code to a different use case. Please make sure to read the
@@ -264,13 +264,12 @@ defmodule App.Accounts do
   end
 
   @doc """
-  Delivers the magic link login instructions to the given user.
+  Delivers the login code instructions to the given user.
   """
-  def deliver_login_instructions(%User{} = user, magic_link_url_fun)
-      when is_function(magic_link_url_fun, 1) do
-    {encoded_token, user_token} = UserToken.build_email_token(user, "login")
+  def deliver_login_instructions(%User{} = user, login_url) when is_binary(login_url) do
+    {code, user_token} = UserToken.build_login_code_token(user)
     Repo.insert!(user_token)
-    UserNotifier.deliver_login_instructions(user, magic_link_url_fun.(encoded_token))
+    UserNotifier.deliver_login_instructions(user, code, login_url)
   end
 
   @doc """

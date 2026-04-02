@@ -39,25 +39,29 @@ defmodule App.Accounts.UserNotifier do
   end
 
   @doc """
-  Deliver instructions to log in with a magic link.
+  Deliver instructions to log in with a login code.
   """
-  def deliver_login_instructions(user, url) do
+  def deliver_login_instructions(user, code, login_url) do
     case user do
-      %User{confirmed_at: nil} -> deliver_confirmation_instructions(user, url)
-      _ -> deliver_magic_link_instructions(user, url)
+      %User{confirmed_at: nil} -> deliver_confirmation_code_instructions(user, code, login_url)
+      _ -> deliver_login_code_instructions(user, code, login_url)
     end
   end
 
-  defp deliver_magic_link_instructions(user, url) do
-    deliver(user.email, "Log in instructions", """
+  defp deliver_login_code_instructions(user, code, login_url) do
+    deliver(user.email, "Your login code", """
 
     ==============================
 
     Hi #{user.email},
 
-    You can log into your account by visiting the URL below:
+    Your login code is:
 
-    #{url}
+    #{code}
+
+    This code expires in 5 minutes.
+
+    You can enter this code at: #{login_url}
 
     If you didn't request this email, please ignore this.
 
@@ -65,16 +69,20 @@ defmodule App.Accounts.UserNotifier do
     """)
   end
 
-  defp deliver_confirmation_instructions(user, url) do
-    deliver(user.email, "Confirmation instructions", """
+  defp deliver_confirmation_code_instructions(user, code, login_url) do
+    deliver(user.email, "Your confirmation code", """
 
     ==============================
 
     Hi #{user.email},
 
-    You can confirm your account by visiting the URL below:
+    Your confirmation code is:
 
-    #{url}
+    #{code}
+
+    This code expires in 5 minutes.
+
+    You can enter this code at: #{login_url}
 
     If you didn't create an account with us, please ignore this.
 
