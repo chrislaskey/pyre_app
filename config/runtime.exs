@@ -52,6 +52,17 @@ if env!("PYRE_GITHUB_REPO_URL", :string, nil) do
     ]
 end
 
+config :pyre, :github_apps, [
+  if env!("PYRE_GITHUB_APP_ID", :string, nil) do
+    [
+      app_id: env!("PYRE_GITHUB_APP_ID", :string),
+      private_key: env!("PYRE_GITHUB_APP_PRIVATE_KEY", :string),
+      webhook_secret: env!("PYRE_GITHUB_WEBHOOK_SECRET", :string),
+      bot_slug: env!("PYRE_GITHUB_APP_BOT_SLUG", :string, nil)
+    ]
+  end
+]
+
 if paths = env!("PYRE_ALLOWED_PATHS", :string, nil) do
   config :pyre,
     allowed_paths:
