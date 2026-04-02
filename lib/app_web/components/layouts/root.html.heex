@@ -10,27 +10,61 @@
     <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
     <script defer phx-track-static type="text/javascript" src={~p"/assets/js/app.js"}>
     </script>
+    
+<!-- DaisyUI + Tailwind from CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@5/themes.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4">
+    </script>
+    
+<!-- Theme persistence -->
     <script>
       (() => {
-        const setTheme = (theme) => {
-          if (theme === "system") {
-            localStorage.removeItem("phx:theme");
-            document.documentElement.removeAttribute("data-theme");
-          } else {
+        const saved = localStorage.getItem("phx:theme");
+        if (saved) {
+          document.documentElement.setAttribute("data-theme", saved);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+          const saved = localStorage.getItem("phx:theme");
+          if (saved) {
+            const radio = document.querySelector(`input.theme-controller[value="${saved}"]`);
+            if (radio) radio.checked = true;
+          }
+        });
+
+        document.addEventListener("change", (e) => {
+          if (e.target.classList.contains("theme-controller")) {
+            const theme = e.target.value;
             localStorage.setItem("phx:theme", theme);
             document.documentElement.setAttribute("data-theme", theme);
           }
-        };
-        if (!document.documentElement.hasAttribute("data-theme")) {
-          setTheme(localStorage.getItem("phx:theme") || "system");
-        }
-        window.addEventListener("storage", (e) => e.key === "phx:theme" && setTheme(e.newValue || "system"));
-        
-        window.addEventListener("phx:set-theme", (e) => setTheme(e.target.dataset.phxTheme));
+        });
+
+        window.addEventListener("storage", (e) => {
+          if (e.key === "phx:theme" && e.newValue) {
+            document.documentElement.setAttribute("data-theme", e.newValue);
+            const radio = document.querySelector(`input.theme-controller[value="${e.newValue}"]`);
+            if (radio) radio.checked = true;
+          }
+        });
       })();
     </script>
   </head>
   <body>
+    <PyreWeb.Components.Layouts.page_header_container>
+      <div class="flex items-center gap-x-2">
+        <PyreWeb.Components.Layouts.page_header_logo prefix="/" />
+      </div>
+      <div class="flex items-center gap-x-1">
+        <PyreWeb.Components.Layouts.theme_selector />
+      </div>
+    </PyreWeb.Components.Layouts.page_header_container>
+
     <ul class="menu menu-horizontal w-full relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
       <%= if @current_scope do %>
         <li>

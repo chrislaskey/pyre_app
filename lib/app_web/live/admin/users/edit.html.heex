@@ -1,0 +1,12 @@
+<Layouts.app flash={@flash} current_scope={@current_scope}>
+  <.header>
+    Edit User
+    <:subtitle>{@user.email}</:subtitle>
+  </.header>
+
+  <.user_form form={@form} action={:edit} />
+
+  <div class="mt-4">
+    <.button navigate={~p"/admin/users/#{@user}"}>Back to user</.button>
+  </div>
+</Layouts.app>

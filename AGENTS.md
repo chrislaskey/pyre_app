@@ -3,6 +3,9 @@ This application is a standalone implementation of the [Pyre](https://github.com
 - Do NOT update the code in this application unless specifically directed to in the prompt
 - Find the app/library the prompt specifies and update code there instead.
 
+## Adding code
+
+When generating LiveView pages, do not use `render` methods but instead create separate `*.html.heex` files.
 
 <!-- phoenix-gen-auth-start -->
 ## Authentication

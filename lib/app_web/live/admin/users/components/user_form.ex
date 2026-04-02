@@ -1,4 +1,4 @@
-defmodule AppWeb.UserManagementLive.UserForm do
+defmodule AppWeb.Admin.Users.UserForm do
   use AppWeb, :html
 
   attr :form, Phoenix.HTML.Form, required: true

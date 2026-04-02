@@ -29,10 +29,10 @@ defmodule AppWeb.Router do
       live "/users/settings", UserLive.Settings, :edit
       live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
 
-      live "/settings/users", UserManagementLive.Index, :index
-      live "/settings/users/new", UserManagementLive.New, :new
-      live "/settings/users/:id", UserManagementLive.Show, :show
-      live "/settings/users/:id/edit", UserManagementLive.Edit, :edit
+      live "/admin/users", Admin.Users.Index, :index
+      live "/admin/users/new", Admin.Users.New, :new
+      live "/admin/users/:id", Admin.Users.Show, :show
+      live "/admin/users/:id/edit", Admin.Users.Edit, :edit
     end
 
     post "/users/update-password", UserSessionController, :update_password

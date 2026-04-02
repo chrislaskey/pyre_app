@@ -1,0 +1,12 @@
+<Layouts.app flash={@flash} current_scope={@current_scope}>
+  <.header>
+    New User
+    <:subtitle>Create a new user account</:subtitle>
+  </.header>
+
+  <.user_form form={@form} action={:new} />
+
+  <div class="mt-4">
+    <.button navigate={~p"/admin/users"}>Back to users</.button>
+  </div>
+</Layouts.app>

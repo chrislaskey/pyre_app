@@ -1,28 +1,10 @@
-defmodule AppWeb.UserManagementLive.New do
+defmodule AppWeb.Admin.Users.New do
   use AppWeb, :live_view
 
   alias App.Accounts
   alias App.Accounts.User
 
-  import AppWeb.UserManagementLive.UserForm
-
-  @impl true
-  def render(assigns) do
-    ~H"""
-    <Layouts.app flash={@flash} current_scope={@current_scope}>
-      <.header>
-        New User
-        <:subtitle>Create a new user account</:subtitle>
-      </.header>
-
-      <.user_form form={@form} action={:new} />
-
-      <div class="mt-4">
-        <.button navigate={~p"/settings/users"}>Back to users</.button>
-      </div>
-    </Layouts.app>
-    """
-  end
+  import AppWeb.Admin.Users.UserForm
 
   @impl true
   def mount(_params, _session, socket) do
@@ -46,7 +28,7 @@ defmodule AppWeb.UserManagementLive.New do
         {:noreply,
          socket
          |> put_flash(:info, "User created successfully.")
-         |> push_navigate(to: ~p"/settings/users/#{user}")}
+         |> push_navigate(to: ~p"/admin/users/#{user}")}
 
       {:error, changeset} ->
         {:noreply, assign(socket, :form, to_form(changeset, action: :insert))}

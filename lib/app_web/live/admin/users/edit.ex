@@ -1,27 +1,9 @@
-defmodule AppWeb.UserManagementLive.Edit do
+defmodule AppWeb.Admin.Users.Edit do
   use AppWeb, :live_view
 
   alias App.Accounts
 
-  import AppWeb.UserManagementLive.UserForm
-
-  @impl true
-  def render(assigns) do
-    ~H"""
-    <Layouts.app flash={@flash} current_scope={@current_scope}>
-      <.header>
-        Edit User
-        <:subtitle>{@user.email}</:subtitle>
-      </.header>
-
-      <.user_form form={@form} action={:edit} />
-
-      <div class="mt-4">
-        <.button navigate={~p"/settings/users/#{@user}"}>Back to user</.button>
-      </div>
-    </Layouts.app>
-    """
-  end
+  import AppWeb.Admin.Users.UserForm
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
@@ -30,7 +12,7 @@ defmodule AppWeb.UserManagementLive.Edit do
         {:ok,
          socket
          |> put_flash(:error, "User not found.")
-         |> push_navigate(to: ~p"/settings/users")}
+         |> push_navigate(to: ~p"/admin/users")}
 
       user ->
         changeset = Accounts.change_user(user)
@@ -54,7 +36,7 @@ defmodule AppWeb.UserManagementLive.Edit do
         {:noreply,
          socket
          |> put_flash(:info, "User updated successfully.")
-         |> push_navigate(to: ~p"/settings/users/#{user}")}
+         |> push_navigate(to: ~p"/admin/users/#{user}")}
 
       {:error, changeset} ->
         {:noreply, assign(socket, :form, to_form(changeset, action: :insert))}
