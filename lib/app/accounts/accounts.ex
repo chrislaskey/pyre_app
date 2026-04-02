@@ -266,10 +266,10 @@ defmodule App.Accounts do
   @doc """
   Delivers the login code instructions to the given user.
   """
-  def deliver_login_instructions(%User{} = user, login_url) when is_binary(login_url) do
+  def deliver_login_instructions(%User{} = user) do
     {code, user_token} = UserToken.build_login_code_token(user)
     Repo.insert!(user_token)
-    UserNotifier.deliver_login_instructions(user, code, login_url)
+    UserNotifier.deliver_login_instructions(user, code)
   end
 
   @doc """

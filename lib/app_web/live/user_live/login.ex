@@ -15,7 +15,7 @@ defmodule AppWeb.UserLive.Login do
               <%= if @current_scope do %>
                 You need to reauthenticate to perform sensitive actions on your account.
               <% else %>
-                Log in to your account below.
+                Enter your email and password. We'll send a verification code to confirm it's you.
               <% end %>
             </:subtitle>
           </.header>
@@ -31,16 +31,10 @@ defmodule AppWeb.UserLive.Login do
           </div>
         </div>
 
-        <.form
-          :let={f}
-          for={@form}
-          id="login_form_magic"
-          action={~p"/users/log-in"}
-          phx-submit="submit_magic"
-        >
+        <.form for={@form} id="login_form" phx-submit="submit">
           <.input
             readonly={!!@current_scope}
-            field={f[:email]}
+            field={@form[:email]}
             type="email"
             label="Email"
             autocomplete="username"
@@ -48,42 +42,17 @@ defmodule AppWeb.UserLive.Login do
             required
             phx-mounted={JS.focus()}
           />
-          <.button class="btn btn-primary w-full">
-            Log in with email <span aria-hidden="true">→</span>
-          </.button>
-        </.form>
-
-        <div class="divider">or</div>
-
-        <.form
-          :let={f}
-          for={@form}
-          id="login_form_password"
-          action={~p"/users/log-in"}
-          phx-submit="submit_password"
-          phx-trigger-action={@trigger_submit}
-        >
-          <.input
-            readonly={!!@current_scope}
-            field={f[:email]}
-            type="email"
-            label="Email"
-            autocomplete="username"
-            spellcheck="false"
-            required
-          />
           <.input
             field={@form[:password]}
             type="password"
             label="Password"
             autocomplete="current-password"
             spellcheck="false"
+            required
           />
-          <.button class="btn btn-primary w-full" name={@form[:remember_me].name} value="true">
-            Log in and stay logged in <span aria-hidden="true">→</span>
-          </.button>
-          <.button class="btn btn-primary btn-soft w-full mt-2">
-            Log in only this time
+          <.input field={@form[:remember_me]} type="checkbox" label="Keep me logged in" />
+          <.button class="btn btn-primary w-full">
+            Continue <span aria-hidden="true">→</span>
           </.button>
         </.form>
       </div>
@@ -97,29 +66,33 @@ defmodule AppWeb.UserLive.Login do
       Phoenix.Flash.get(socket.assigns.flash, :email) ||
         get_in(socket.assigns, [:current_scope, Access.key(:user), Access.key(:email)])
 
-    form = to_form(%{"email" => email}, as: "user")
+    form = to_form(%{"email" => email, "remember_me" => "true"}, as: "user")
 
-    {:ok, assign(socket, form: form, trigger_submit: false)}
+    {:ok, assign(socket, form: form)}
   end
 
   @impl true
-  def handle_event("submit_password", _params, socket) do
-    {:noreply, assign(socket, :trigger_submit, true)}
-  end
+  def handle_event("submit", %{"user" => user_params}, socket) do
+    %{"email" => email, "password" => password} = user_params
+    remember_me = user_params["remember_me"] == "true"
 
-  def handle_event("submit_magic", %{"user" => %{"email" => email}}, socket) do
-    if user = Accounts.get_user_by_email(email) do
-      Accounts.deliver_login_instructions(user, url(~p"/users/log-in/code"))
+    case Accounts.get_user_by_email_and_password(email, password) do
+      nil ->
+        {:noreply,
+         socket
+         |> put_flash(:error, "Invalid email or password.")
+         |> assign(form: to_form(%{"email" => email}, as: "user"))}
+
+      user ->
+        Accounts.deliver_login_instructions(user)
+
+        {:noreply,
+         socket
+         |> put_flash(:info, "We sent a verification code to your email.")
+         |> put_flash(:login_email, email)
+         |> put_flash(:login_remember_me, remember_me)
+         |> push_navigate(to: ~p"/users/log-in/code")}
     end
-
-    info =
-      "If your email is in our system, you will receive instructions for logging in shortly."
-
-    {:noreply,
-     socket
-     |> put_flash(:info, info)
-     |> put_flash(:login_email, email)
-     |> push_navigate(to: ~p"/users/log-in/code")}
   end
 
   defp local_mail_adapter? do

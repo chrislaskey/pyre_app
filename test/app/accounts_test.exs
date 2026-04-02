@@ -374,7 +374,7 @@ defmodule App.AccountsTest do
     end
   end
 
-  describe "deliver_login_instructions/2" do
+  describe "deliver_login_instructions/1" do
     setup do
       %{user: unconfirmed_user_fixture()}
     end
@@ -382,7 +382,7 @@ defmodule App.AccountsTest do
     test "sends login code through notification", %{user: user} do
       code =
         extract_login_code(fn ->
-          Accounts.deliver_login_instructions(user, "http://localhost/users/log-in/code")
+          Accounts.deliver_login_instructions(user)
         end)
 
       assert String.match?(code, ~r/^\d{6}$/)

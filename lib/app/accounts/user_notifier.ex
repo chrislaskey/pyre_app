@@ -41,14 +41,14 @@ defmodule App.Accounts.UserNotifier do
   @doc """
   Deliver instructions to log in with a login code.
   """
-  def deliver_login_instructions(user, code, login_url) do
+  def deliver_login_instructions(user, code) do
     case user do
-      %User{confirmed_at: nil} -> deliver_confirmation_code_instructions(user, code, login_url)
-      _ -> deliver_login_code_instructions(user, code, login_url)
+      %User{confirmed_at: nil} -> deliver_confirmation_code_instructions(user, code)
+      _ -> deliver_login_code_instructions(user, code)
     end
   end
 
-  defp deliver_login_code_instructions(user, code, login_url) do
+  defp deliver_login_code_instructions(user, code) do
     deliver(user.email, "Your login code", """
 
     ==============================
@@ -61,15 +61,13 @@ defmodule App.Accounts.UserNotifier do
 
     This code expires in 5 minutes.
 
-    You can enter this code at: #{login_url}
-
     If you didn't request this email, please ignore this.
 
     ==============================
     """)
   end
 
-  defp deliver_confirmation_code_instructions(user, code, login_url) do
+  defp deliver_confirmation_code_instructions(user, code) do
     deliver(user.email, "Your confirmation code", """
 
     ==============================
@@ -81,8 +79,6 @@ defmodule App.Accounts.UserNotifier do
     #{code}
 
     This code expires in 5 minutes.
-
-    You can enter this code at: #{login_url}
 
     If you didn't create an account with us, please ignore this.
 

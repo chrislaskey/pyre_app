@@ -7,7 +7,8 @@ defmodule AppWeb.UserLive.LoginCodeTest do
   alias App.Accounts
 
   setup do
-    %{unconfirmed_user: unconfirmed_user_fixture(), confirmed_user: user_fixture()}
+    confirmed_user = user_fixture() |> set_password()
+    %{confirmed_user: confirmed_user}
   end
 
   describe "Login code page" do
@@ -19,51 +20,22 @@ defmodule AppWeb.UserLive.LoginCodeTest do
       assert html =~ "Please enter your email first."
     end
 
-    test "renders code entry form for unconfirmed user", %{conn: conn, unconfirmed_user: user} do
-      code =
-        extract_login_code(fn ->
-          Accounts.deliver_login_instructions(user, "http://localhost/users/log-in/code")
-        end)
-
+    test "full login flow with password and code", %{conn: conn, confirmed_user: user} do
       {:ok, lv, _html} = live(conn, ~p"/users/log-in")
 
       {:ok, lv, html} =
-        form(lv, "#login_form_magic", user: %{email: user.email})
+        form(lv, "#login_form", user: %{email: user.email, password: valid_user_password()})
         |> render_submit()
         |> follow_redirect(conn, ~p"/users/log-in/code")
 
       assert html =~ "Enter your login code"
       assert html =~ user.email
 
-      form =
-        form(lv, "#login_code_form", %{"user" => %{"code" => code, "email" => user.email}})
-
-      render_submit(form)
-
-      conn = follow_trigger_action(form, conn)
-
-      assert Phoenix.Flash.get(conn.assigns.flash, :info) =~
-               "User confirmed successfully"
-
-      assert Accounts.get_user!(user.id).confirmed_at
-      assert get_session(conn, :user_token)
-      assert redirected_to(conn) == ~p"/"
-    end
-
-    test "renders code entry form for confirmed user", %{conn: conn, confirmed_user: user} do
+      # Generate a fresh code since we can't reverse the hash from the first one
       code =
         extract_login_code(fn ->
-          Accounts.deliver_login_instructions(user, "http://localhost/users/log-in/code")
+          Accounts.deliver_login_instructions(user)
         end)
-
-      {:ok, lv, _html} = live(conn, ~p"/users/log-in")
-
-      {:ok, lv, html} =
-        form(lv, "#login_form_magic", user: %{email: user.email})
-        |> render_submit()
-        |> follow_redirect(conn, ~p"/users/log-in/code")
-
-      assert html =~ "Enter your login code"
 
       form =
         form(lv, "#login_code_form", %{"user" => %{"code" => code, "email" => user.email}})
@@ -80,15 +52,10 @@ defmodule AppWeb.UserLive.LoginCodeTest do
     end
 
     test "shows error for invalid code", %{conn: conn, confirmed_user: user} do
-      _code =
-        extract_login_code(fn ->
-          Accounts.deliver_login_instructions(user, "http://localhost/users/log-in/code")
-        end)
-
       {:ok, lv, _html} = live(conn, ~p"/users/log-in")
 
       {:ok, lv, _html} =
-        form(lv, "#login_form_magic", user: %{email: user.email})
+        form(lv, "#login_form", user: %{email: user.email, password: valid_user_password()})
         |> render_submit()
         |> follow_redirect(conn, ~p"/users/log-in/code")
 

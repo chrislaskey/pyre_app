@@ -32,7 +32,7 @@ defmodule App.AccountsFixtures do
 
     code =
       extract_login_code(fn ->
-        Accounts.deliver_login_instructions(user, "http://localhost/users/log-in/code")
+        Accounts.deliver_login_instructions(user)
       end)
 
     {:ok, {user, _expired_tokens}} =

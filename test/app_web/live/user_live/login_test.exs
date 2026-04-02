@@ -9,68 +9,50 @@ defmodule AppWeb.UserLive.LoginTest do
       {:ok, _lv, html} = live(conn, ~p"/users/log-in")
 
       assert html =~ "Log in"
-      assert html =~ "Log in with email"
+      assert html =~ "Continue"
     end
   end
 
-  describe "user login - email code" do
-    test "sends login code email when user exists", %{conn: conn} do
-      user = user_fixture()
+  describe "user login" do
+    test "sends verification code when credentials are valid", %{conn: conn} do
+      user = user_fixture() |> set_password()
 
       {:ok, lv, _html} = live(conn, ~p"/users/log-in")
 
       {:ok, _lv, html} =
-        form(lv, "#login_form_magic", user: %{email: user.email})
+        form(lv, "#login_form", user: %{email: user.email, password: valid_user_password()})
         |> render_submit()
         |> follow_redirect(conn, ~p"/users/log-in/code")
 
-      assert html =~ "If your email is in our system"
+      assert html =~ "We sent a verification code to your email."
 
       assert App.Repo.get_by!(App.Accounts.UserToken, user_id: user.id).context ==
                "login"
     end
 
-    test "does not disclose if user is registered", %{conn: conn} do
+    test "shows error for invalid credentials", %{conn: conn} do
       {:ok, lv, _html} = live(conn, ~p"/users/log-in")
 
-      {:ok, _lv, html} =
-        form(lv, "#login_form_magic", user: %{email: "idonotexist@example.com"})
+      html =
+        form(lv, "#login_form",
+          user: %{email: "idonotexist@example.com", password: "wrongpassword1"}
+        )
         |> render_submit()
-        |> follow_redirect(conn, ~p"/users/log-in/code")
 
-      assert html =~ "If your email is in our system"
+      assert html =~ "Invalid email or password."
     end
-  end
 
-  describe "user login - password" do
-    test "redirects if user logs in with valid credentials", %{conn: conn} do
+    test "shows error for wrong password", %{conn: conn} do
       user = user_fixture() |> set_password()
 
       {:ok, lv, _html} = live(conn, ~p"/users/log-in")
 
-      form =
-        form(lv, "#login_form_password",
-          user: %{email: user.email, password: valid_user_password(), remember_me: true}
-        )
+      html =
+        form(lv, "#login_form", user: %{email: user.email, password: "wrongpassword1"})
+        |> render_submit()
 
-      conn = submit_form(form, conn)
-
-      assert redirected_to(conn) == ~p"/"
-    end
-
-    test "redirects to login page with a flash error if credentials are invalid", %{
-      conn: conn
-    } do
-      {:ok, lv, _html} = live(conn, ~p"/users/log-in")
-
-      form =
-        form(lv, "#login_form_password", user: %{email: "test@email.com", password: "123456"})
-
-      render_submit(form, %{user: %{remember_me: true}})
-
-      conn = follow_trigger_action(form, conn)
-      assert Phoenix.Flash.get(conn.assigns.flash, :error) == "Invalid email or password"
-      assert redirected_to(conn) == ~p"/users/log-in"
+      assert html =~ "Invalid email or password."
+      refute App.Repo.get_by(App.Accounts.UserToken, user_id: user.id, context: "login")
     end
   end
 
@@ -84,10 +66,7 @@ defmodule AppWeb.UserLive.LoginTest do
       {:ok, _lv, html} = live(conn, ~p"/users/log-in")
 
       assert html =~ "You need to reauthenticate"
-      assert html =~ "Log in with email"
-
-      assert html =~
-               ~s(<input type="email" name="user[email]" id="login_form_magic_email" value="#{user.email}")
+      assert html =~ user.email
     end
   end
 end

@@ -26,6 +26,7 @@ defmodule AppWeb.UserLive.LoginCode do
           phx-trigger-action={@trigger_submit}
         >
           <input type="hidden" name={@form[:email].name} value={@email} />
+          <input :if={@remember_me} type="hidden" name={@form[:remember_me].name} value="true" />
           <.input
             field={@form[:code]}
             type="text"
@@ -55,6 +56,7 @@ defmodule AppWeb.UserLive.LoginCode do
   @impl true
   def mount(_params, _session, socket) do
     email = Phoenix.Flash.get(socket.assigns.flash, :login_email)
+    remember_me = Phoenix.Flash.get(socket.assigns.flash, :login_remember_me) || false
 
     if email do
       form = to_form(%{"code" => "", "email" => email}, as: "user")
@@ -62,6 +64,7 @@ defmodule AppWeb.UserLive.LoginCode do
       {:ok,
        assign(socket,
          email: email,
+         remember_me: remember_me,
          form: form,
          trigger_submit: false,
          form_action: ~p"/users/log-in"
