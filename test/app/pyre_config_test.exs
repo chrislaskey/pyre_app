@@ -1,7 +1,7 @@
 defmodule App.PyreConfigTest do
   use App.DataCase, async: false
 
-  alias App.PyreConfig
+  alias App.Pyre.Config, as: PyreConfig
   alias App.Pyre.GithubApps
 
   import App.PyreFixtures

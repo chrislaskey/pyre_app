@@ -11,6 +11,7 @@ defmodule App.Application do
       AppWeb.Telemetry,
       App.Repo,
       {Ecto.Migrator, repos: Application.fetch_env!(:app, :ecto_repos), skip: skip_migrations?()},
+      {Task, &App.Seeds.Accounts.seed/0},
       {DNSCluster, query: Application.get_env(:app, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: App.PubSub},
       PyreWeb.Presence,

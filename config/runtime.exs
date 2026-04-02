@@ -72,6 +72,15 @@ if paths = env!("PYRE_ALLOWED_PATHS", :string, nil) do
       |> Enum.map(&Path.expand/1)
 end
 
+config :app, :accounts, [
+  if env!("APP_ADMIN_USER_EMAIL", :string, nil) do
+    [
+      email: env!("APP_ADMIN_USER_EMAIL", :string),
+      password: env!("APP_ADMIN_USER_PASSWORD", :string)
+    ]
+  end
+]
+
 if config_env() == :prod do
   database_path =
     env!("DATABASE_PATH", :string, nil) ||

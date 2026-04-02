@@ -2,7 +2,6 @@ defmodule App.Pyre.Config.GithubApps do
   @moduledoc "Pyre Callbacks for Github Apps"
 
   def update_github_app(credentials) do
-    App.Pyre.Config.GithubApps.update_github_app(credentials)
     attrs = normalize_credentials(credentials)
 
     case App.Pyre.GithubApps.upsert(attrs) do
