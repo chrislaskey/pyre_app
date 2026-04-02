@@ -15,8 +15,7 @@ defmodule AppWeb.Endpoint do
     websocket: [connect_info: [session: @session_options]],
     longpoll: [connect_info: [session: @session_options]]
 
-  socket "/", PyreWeb.Socket,
-    websocket: [connect_info: [:peer_data, :x_headers]]
+  socket "/", PyreWeb.Socket, websocket: [connect_info: [:peer_data, :x_headers]]
 
   # Serve at "/" the static files from "priv/static" directory.
   #

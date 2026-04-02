@@ -40,6 +40,7 @@ defmodule App.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:bcrypt_elixir, "~> 3.0"},
       # Default phoenix deps
       {:phoenix, "~> 1.8.5"},
       {:phoenix_ecto, "~> 4.5"},
@@ -73,7 +74,7 @@ defmodule App.MixProject do
       {:pyre_web, git: "https://github.com/chrislaskey/pyre_web", branch: "main"},
 
       # Additional deps
-      {:dotenvy, "~> 1.1.0"},
+      {:dotenvy, "~> 1.1.0"}
     ]
   end
 

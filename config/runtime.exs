@@ -43,7 +43,7 @@ if env!("PYRE_GITHUB_REPO_URL", :string, nil) do
         url: env!("PYRE_GITHUB_REPO_URL", :string),
         token: env!("PYRE_GITHUB_TOKEN", :string),
         base_branch: env!("PYRE_GITHUB_BASE_BRANCH", :string, "main")
-      ],
+      ]
       # [
       #   url: System.get_env("PYRE_ADDITIONAL_GITHUB_REPO_URL"),
       #   token: System.get_env("PYRE_ADDITIONAL_GITHUB_TOKEN"),

@@ -1,6 +1,8 @@
 defmodule AppWeb.Router do
   use AppWeb, :router
 
+  import AppWeb.UserAuth
+
   import PyreWeb.Router
 
   pipeline :browser do
@@ -10,10 +12,39 @@ defmodule AppWeb.Router do
     plug :put_root_layout, html: {AppWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :fetch_current_scope_for_user
   end
 
   pipeline :api do
     plug :accepts, ["json"]
+  end
+
+  ## Authentication routes
+
+  scope "/", AppWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :require_authenticated_user,
+      on_mount: [{AppWeb.UserAuth, :require_authenticated}] do
+      live "/users/settings", UserLive.Settings, :edit
+      live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
+    end
+
+    post "/users/update-password", UserSessionController, :update_password
+  end
+
+  scope "/", AppWeb do
+    pipe_through [:browser]
+
+    live_session :current_user,
+      on_mount: [{AppWeb.UserAuth, :mount_current_scope}] do
+      live "/users/register", UserLive.Registration, :new
+      live "/users/log-in", UserLive.Login, :new
+      live "/users/log-in/:token", UserLive.Confirmation, :new
+    end
+
+    post "/users/log-in", UserSessionController, :create
+    delete "/users/log-out", UserSessionController, :delete
   end
 
   scope "/", AppWeb do
@@ -25,7 +56,7 @@ defmodule AppWeb.Router do
   scope "/" do
     pipe_through :browser
 
-    pyre_web "/"
+    pyre_web("/")
   end
 
   # Other scopes may use custom stacks.
