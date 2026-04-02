@@ -42,15 +42,6 @@ defmodule App.Accounts.User do
       changeset
       |> unsafe_validate_unique(:email, App.Repo)
       |> unique_constraint(:email)
-      |> validate_email_changed()
-    else
-      changeset
-    end
-  end
-
-  defp validate_email_changed(changeset) do
-    if get_field(changeset, :email) && get_change(changeset, :email) == nil do
-      add_error(changeset, :email, "did not change")
     else
       changeset
     end

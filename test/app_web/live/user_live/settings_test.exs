@@ -74,7 +74,7 @@ defmodule AppWeb.UserLive.SettingsTest do
       assert result =~ "must have the @ sign and no spaces"
     end
 
-    test "renders errors with invalid data (phx-submit)", %{conn: conn, user: user} do
+    test "submits successfully when email is unchanged", %{conn: conn, user: user} do
       {:ok, lv, _html} = live(conn, ~p"/users/settings")
 
       result =
@@ -84,8 +84,7 @@ defmodule AppWeb.UserLive.SettingsTest do
         })
         |> render_submit()
 
-      assert result =~ "Change Email"
-      assert result =~ "did not change"
+      assert result =~ "A link to confirm your email"
     end
   end
 

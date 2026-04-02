@@ -48,6 +48,114 @@ defmodule App.AccountsTest do
     end
   end
 
+  describe "list_users/0" do
+    test "returns all users ordered by email" do
+      user_a = user_fixture(email: "alice@example.com")
+      user_b = user_fixture(email: "bob@example.com")
+
+      users = Accounts.list_users()
+      assert [%User{id: id_a}, %User{id: id_b}] = users
+      assert id_a == user_a.id
+      assert id_b == user_b.id
+    end
+
+    test "returns empty list when no users" do
+      assert Accounts.list_users() == []
+    end
+  end
+
+  describe "get_user/1" do
+    test "returns the user with the given id" do
+      %{id: id} = user_fixture()
+      assert %User{id: ^id} = Accounts.get_user(id)
+    end
+
+    test "returns nil if user does not exist" do
+      assert Accounts.get_user(-1) == nil
+    end
+  end
+
+  describe "create_user/1" do
+    test "creates a user with valid email" do
+      email = unique_user_email()
+      assert {:ok, user} = Accounts.create_user(%{email: email})
+      assert user.email == email
+      assert is_nil(user.hashed_password)
+      assert is_nil(user.confirmed_at)
+    end
+
+    test "returns error with invalid email" do
+      assert {:error, changeset} = Accounts.create_user(%{email: "invalid"})
+      assert %{email: ["must have the @ sign and no spaces"]} = errors_on(changeset)
+    end
+
+    test "returns error with duplicate email" do
+      %{email: email} = user_fixture()
+      assert {:error, changeset} = Accounts.create_user(%{email: email})
+      assert "has already been taken" in errors_on(changeset).email
+    end
+
+    test "returns error with blank email" do
+      assert {:error, changeset} = Accounts.create_user(%{})
+      assert %{email: ["can't be blank"]} = errors_on(changeset)
+    end
+
+    test "validates maximum length for email" do
+      too_long = String.duplicate("a", 161)
+      assert {:error, changeset} = Accounts.create_user(%{email: too_long})
+      assert "should be at most 160 character(s)" in errors_on(changeset).email
+    end
+  end
+
+  describe "update_user/2" do
+    test "updates the user email" do
+      user = user_fixture()
+      new_email = unique_user_email()
+      assert {:ok, updated} = Accounts.update_user(user, %{email: new_email})
+      assert updated.email == new_email
+    end
+
+    test "returns error with invalid email" do
+      user = user_fixture()
+      assert {:error, changeset} = Accounts.update_user(user, %{email: "invalid"})
+      assert %{email: ["must have the @ sign and no spaces"]} = errors_on(changeset)
+    end
+
+    test "returns error with duplicate email" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      assert {:error, changeset} = Accounts.update_user(user1, %{email: user2.email})
+      assert "has already been taken" in errors_on(changeset).email
+    end
+
+    test "succeeds when email is unchanged" do
+      user = user_fixture()
+      assert {:ok, updated} = Accounts.update_user(user, %{email: user.email})
+      assert updated.email == user.email
+    end
+  end
+
+  describe "delete_user/1" do
+    test "deletes the user" do
+      user = user_fixture()
+      assert {:ok, %User{}} = Accounts.delete_user(user)
+      assert Accounts.get_user(user.id) == nil
+    end
+  end
+
+  describe "change_user/2" do
+    test "returns a changeset" do
+      user = user_fixture()
+      assert %Ecto.Changeset{} = Accounts.change_user(user)
+    end
+
+    test "allows setting email" do
+      changeset = Accounts.change_user(%User{}, %{email: "test@example.com"})
+      assert changeset.valid?
+      assert get_change(changeset, :email) == "test@example.com"
+    end
+  end
+
   describe "register_user/1" do
     test "requires email to be set" do
       {:error, changeset} = Accounts.register_user(%{})

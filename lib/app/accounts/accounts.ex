@@ -80,6 +80,52 @@ defmodule App.Accounts do
     |> Repo.insert()
   end
 
+  ## User management
+
+  @doc """
+  Returns the list of users ordered by email.
+  """
+  def list_users do
+    Repo.all(from u in User, order_by: [asc: u.email])
+  end
+
+  @doc """
+  Gets a single user. Returns `nil` if not found.
+  """
+  def get_user(id), do: Repo.get(User, id)
+
+  @doc """
+  Creates a user with the given attributes.
+  """
+  def create_user(attrs) do
+    %User{}
+    |> User.email_changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a user's email.
+  """
+  def update_user(%User{} = user, attrs) do
+    user
+    |> User.email_changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a user.
+  """
+  def delete_user(%User{} = user) do
+    Repo.delete(user)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking user changes.
+  """
+  def change_user(%User{} = user, attrs \\ %{}) do
+    User.email_changeset(user, attrs, validate_unique: false)
+  end
+
   ## Settings
 
   @doc """
