@@ -11,7 +11,7 @@ defmodule AppWeb.UserManagementLiveTest do
     test "lists all users", %{conn: conn, user: user} do
       other_user = user_fixture(email: "other@example.com")
 
-      {:ok, _lv, html} = live(conn, ~p"/settings/users")
+      {:ok, _lv, html} = live(conn, ~p"/admin/users")
 
       assert html =~ "Users"
       assert html =~ user.email
@@ -19,38 +19,38 @@ defmodule AppWeb.UserManagementLiveTest do
     end
 
     test "navigates to new user page", %{conn: conn} do
-      {:ok, lv, _html} = live(conn, ~p"/settings/users")
+      {:ok, lv, _html} = live(conn, ~p"/admin/users")
 
       lv
-      |> element(~s|a[href="/settings/users/new"]|)
+      |> element(~s|a[href="/admin/users/new"]|)
       |> render_click()
 
-      assert_redirect(lv, ~p"/settings/users/new")
+      assert_redirect(lv, ~p"/admin/users/new")
     end
 
     test "navigates to show user page", %{conn: conn, user: user} do
-      {:ok, lv, _html} = live(conn, ~p"/settings/users")
+      {:ok, lv, _html} = live(conn, ~p"/admin/users")
 
       lv
-      |> element(~s|a[href="/settings/users/#{user.id}"]|, "Show")
+      |> element(~s|a[href="/admin/users/#{user.id}"]|, "Show")
       |> render_click()
 
-      assert_redirect(lv, ~p"/settings/users/#{user}")
+      assert_redirect(lv, ~p"/admin/users/#{user}")
     end
 
     test "navigates to edit user page", %{conn: conn, user: user} do
-      {:ok, lv, _html} = live(conn, ~p"/settings/users")
+      {:ok, lv, _html} = live(conn, ~p"/admin/users")
 
       lv
-      |> element(~s|a[href="/settings/users/#{user.id}/edit"]|, "Edit")
+      |> element(~s|a[href="/admin/users/#{user.id}/edit"]|, "Edit")
       |> render_click()
 
-      assert_redirect(lv, ~p"/settings/users/#{user}/edit")
+      assert_redirect(lv, ~p"/admin/users/#{user}/edit")
     end
 
     test "redirects if user is not logged in", %{conn: _conn} do
       conn = build_conn()
-      assert {:error, redirect} = live(conn, ~p"/settings/users")
+      assert {:error, redirect} = live(conn, ~p"/admin/users")
       assert {:redirect, %{to: path}} = redirect
       assert path == ~p"/users/log-in"
     end
@@ -62,7 +62,7 @@ defmodule AppWeb.UserManagementLiveTest do
     test "displays user details", %{conn: conn} do
       user = user_fixture(email: "show-test@example.com")
 
-      {:ok, _lv, html} = live(conn, ~p"/settings/users/#{user}")
+      {:ok, _lv, html} = live(conn, ~p"/admin/users/#{user}")
 
       assert html =~ "show-test@example.com"
       assert html =~ "User ID: #{user.id}"
@@ -71,21 +71,21 @@ defmodule AppWeb.UserManagementLiveTest do
     test "navigates to edit page", %{conn: conn} do
       user = user_fixture()
 
-      {:ok, lv, _html} = live(conn, ~p"/settings/users/#{user}")
+      {:ok, lv, _html} = live(conn, ~p"/admin/users/#{user}")
 
       lv
-      |> element(~s|a[href="/settings/users/#{user.id}/edit"]|)
+      |> element(~s|a[href="/admin/users/#{user.id}/edit"]|)
       |> render_click()
 
-      assert_redirect(lv, ~p"/settings/users/#{user}/edit")
+      assert_redirect(lv, ~p"/admin/users/#{user}/edit")
     end
 
     test "deletes user", %{conn: conn} do
       user = user_fixture(email: "delete-me@example.com")
 
-      {:ok, lv, _html} = live(conn, ~p"/settings/users/#{user}")
+      {:ok, lv, _html} = live(conn, ~p"/admin/users/#{user}")
 
-      assert {:error, {:live_redirect, %{to: "/settings/users"}}} =
+      assert {:error, {:live_redirect, %{to: "/admin/users"}}} =
                lv
                |> element(~s|button[phx-click="delete"]|)
                |> render_click()
@@ -96,18 +96,18 @@ defmodule AppWeb.UserManagementLiveTest do
     test "navigates back to users list", %{conn: conn} do
       user = user_fixture()
 
-      {:ok, lv, _html} = live(conn, ~p"/settings/users/#{user}")
+      {:ok, lv, _html} = live(conn, ~p"/admin/users/#{user}")
 
       lv
-      |> element(~s|a[href="/settings/users"]|, "Back to users")
+      |> element(~s|a[href="/admin/users"]|, "Back to users")
       |> render_click()
 
-      assert_redirect(lv, ~p"/settings/users")
+      assert_redirect(lv, ~p"/admin/users")
     end
 
     test "redirects when user not found", %{conn: conn} do
-      assert {:error, {:live_redirect, %{to: "/settings/users", flash: flash}}} =
-               live(conn, ~p"/settings/users/-1")
+      assert {:error, {:live_redirect, %{to: "/admin/users", flash: flash}}} =
+               live(conn, ~p"/admin/users/-1")
 
       assert %{"error" => "User not found."} = flash
     end
@@ -115,7 +115,7 @@ defmodule AppWeb.UserManagementLiveTest do
     test "redirects if not logged in", %{conn: _conn} do
       conn = build_conn()
       user = user_fixture()
-      assert {:error, redirect} = live(conn, ~p"/settings/users/#{user}")
+      assert {:error, redirect} = live(conn, ~p"/admin/users/#{user}")
       assert {:redirect, %{to: path}} = redirect
       assert path == ~p"/users/log-in"
     end
@@ -125,14 +125,14 @@ defmodule AppWeb.UserManagementLiveTest do
     setup :register_and_log_in_user
 
     test "renders new user form", %{conn: conn} do
-      {:ok, _lv, html} = live(conn, ~p"/settings/users/new")
+      {:ok, _lv, html} = live(conn, ~p"/admin/users/new")
 
       assert html =~ "New User"
       assert html =~ "Create User"
     end
 
     test "validates form on change", %{conn: conn} do
-      {:ok, lv, _html} = live(conn, ~p"/settings/users/new")
+      {:ok, lv, _html} = live(conn, ~p"/admin/users/new")
 
       result =
         lv
@@ -144,9 +144,9 @@ defmodule AppWeb.UserManagementLiveTest do
 
     test "creates user with valid data", %{conn: conn} do
       email = unique_user_email()
-      {:ok, lv, _html} = live(conn, ~p"/settings/users/new")
+      {:ok, lv, _html} = live(conn, ~p"/admin/users/new")
 
-      assert {:error, {:live_redirect, %{to: "/settings/users/" <> _}}} =
+      assert {:error, {:live_redirect, %{to: "/admin/users/" <> _}}} =
                lv
                |> form("#user-form", %{"user" => %{"email" => email}})
                |> render_submit()
@@ -155,7 +155,7 @@ defmodule AppWeb.UserManagementLiveTest do
     end
 
     test "renders errors with invalid data on submit", %{conn: conn} do
-      {:ok, lv, _html} = live(conn, ~p"/settings/users/new")
+      {:ok, lv, _html} = live(conn, ~p"/admin/users/new")
 
       result =
         lv
@@ -167,7 +167,7 @@ defmodule AppWeb.UserManagementLiveTest do
 
     test "renders errors for duplicate email", %{conn: conn} do
       existing = user_fixture()
-      {:ok, lv, _html} = live(conn, ~p"/settings/users/new")
+      {:ok, lv, _html} = live(conn, ~p"/admin/users/new")
 
       result =
         lv
@@ -178,18 +178,18 @@ defmodule AppWeb.UserManagementLiveTest do
     end
 
     test "navigates back to users list", %{conn: conn} do
-      {:ok, lv, _html} = live(conn, ~p"/settings/users/new")
+      {:ok, lv, _html} = live(conn, ~p"/admin/users/new")
 
       lv
-      |> element(~s|a[href="/settings/users"]|, "Back to users")
+      |> element(~s|a[href="/admin/users"]|, "Back to users")
       |> render_click()
 
-      assert_redirect(lv, ~p"/settings/users")
+      assert_redirect(lv, ~p"/admin/users")
     end
 
     test "redirects if not logged in", %{conn: _conn} do
       conn = build_conn()
-      assert {:error, redirect} = live(conn, ~p"/settings/users/new")
+      assert {:error, redirect} = live(conn, ~p"/admin/users/new")
       assert {:redirect, %{to: path}} = redirect
       assert path == ~p"/users/log-in"
     end
@@ -204,14 +204,14 @@ defmodule AppWeb.UserManagementLiveTest do
     end
 
     test "renders edit form with current email", %{conn: conn, target_user: user} do
-      {:ok, _lv, html} = live(conn, ~p"/settings/users/#{user}/edit")
+      {:ok, _lv, html} = live(conn, ~p"/admin/users/#{user}/edit")
 
       assert html =~ "Edit User"
       assert html =~ "edit-target@example.com"
     end
 
     test "validates form on change", %{conn: conn, target_user: user} do
-      {:ok, lv, _html} = live(conn, ~p"/settings/users/#{user}/edit")
+      {:ok, lv, _html} = live(conn, ~p"/admin/users/#{user}/edit")
 
       result =
         lv
@@ -223,9 +223,9 @@ defmodule AppWeb.UserManagementLiveTest do
 
     test "updates user with valid data", %{conn: conn, target_user: user} do
       new_email = unique_user_email()
-      {:ok, lv, _html} = live(conn, ~p"/settings/users/#{user}/edit")
+      {:ok, lv, _html} = live(conn, ~p"/admin/users/#{user}/edit")
 
-      assert {:error, {:live_redirect, %{to: "/settings/users/" <> _}}} =
+      assert {:error, {:live_redirect, %{to: "/admin/users/" <> _}}} =
                lv
                |> form("#user-form", %{"user" => %{"email" => new_email}})
                |> render_submit()
@@ -235,9 +235,9 @@ defmodule AppWeb.UserManagementLiveTest do
     end
 
     test "succeeds when email is unchanged", %{conn: conn, target_user: user} do
-      {:ok, lv, _html} = live(conn, ~p"/settings/users/#{user}/edit")
+      {:ok, lv, _html} = live(conn, ~p"/admin/users/#{user}/edit")
 
-      assert {:error, {:live_redirect, %{to: "/settings/users/" <> _}}} =
+      assert {:error, {:live_redirect, %{to: "/admin/users/" <> _}}} =
                lv
                |> form("#user-form", %{"user" => %{"email" => user.email}})
                |> render_submit()
@@ -246,7 +246,7 @@ defmodule AppWeb.UserManagementLiveTest do
     end
 
     test "renders errors with invalid data on submit", %{conn: conn, target_user: user} do
-      {:ok, lv, _html} = live(conn, ~p"/settings/users/#{user}/edit")
+      {:ok, lv, _html} = live(conn, ~p"/admin/users/#{user}/edit")
 
       result =
         lv
@@ -258,7 +258,7 @@ defmodule AppWeb.UserManagementLiveTest do
 
     test "renders errors for duplicate email", %{conn: conn, target_user: user} do
       other = user_fixture()
-      {:ok, lv, _html} = live(conn, ~p"/settings/users/#{user}/edit")
+      {:ok, lv, _html} = live(conn, ~p"/admin/users/#{user}/edit")
 
       result =
         lv
@@ -269,18 +269,18 @@ defmodule AppWeb.UserManagementLiveTest do
     end
 
     test "navigates back to user show page", %{conn: conn, target_user: user} do
-      {:ok, lv, _html} = live(conn, ~p"/settings/users/#{user}/edit")
+      {:ok, lv, _html} = live(conn, ~p"/admin/users/#{user}/edit")
 
       lv
-      |> element(~s|a[href="/settings/users/#{user.id}"]|, "Back to user")
+      |> element(~s|a[href="/admin/users/#{user.id}"]|, "Back to user")
       |> render_click()
 
-      assert_redirect(lv, ~p"/settings/users/#{user}")
+      assert_redirect(lv, ~p"/admin/users/#{user}")
     end
 
     test "redirects when user not found", %{conn: conn} do
-      assert {:error, {:live_redirect, %{to: "/settings/users", flash: flash}}} =
-               live(conn, ~p"/settings/users/-1/edit")
+      assert {:error, {:live_redirect, %{to: "/admin/users", flash: flash}}} =
+               live(conn, ~p"/admin/users/-1/edit")
 
       assert %{"error" => "User not found."} = flash
     end
@@ -288,7 +288,7 @@ defmodule AppWeb.UserManagementLiveTest do
     test "redirects if not logged in", %{conn: _conn} do
       conn = build_conn()
       user = user_fixture()
-      assert {:error, redirect} = live(conn, ~p"/settings/users/#{user}/edit")
+      assert {:error, redirect} = live(conn, ~p"/admin/users/#{user}/edit")
       assert {:redirect, %{to: path}} = redirect
       assert path == ~p"/users/log-in"
     end
