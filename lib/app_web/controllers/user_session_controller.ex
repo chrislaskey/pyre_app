@@ -12,6 +12,23 @@ defmodule AppWeb.UserSessionController do
     create(conn, params, "Welcome back!")
   end
 
+  # magic link token
+  defp create(conn, %{"user" => %{"token" => token} = user_params}, info) do
+    case Accounts.login_user_by_magic_link(token) do
+      {:ok, {user, tokens_to_disconnect}} ->
+        UserAuth.disconnect_sessions(tokens_to_disconnect)
+
+        conn
+        |> put_flash(:info, info)
+        |> UserAuth.log_in_user(user, user_params)
+
+      _ ->
+        conn
+        |> put_flash(:error, "Login link is invalid or it has expired.")
+        |> redirect(to: ~p"/users/log-in")
+    end
+  end
+
   # login code
   defp create(conn, %{"user" => %{"code" => code, "email" => email} = user_params}, info) do
     case Accounts.login_user_by_login_code(code, email) do

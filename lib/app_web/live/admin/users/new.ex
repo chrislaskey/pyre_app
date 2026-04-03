@@ -13,6 +13,11 @@ defmodule AppWeb.Admin.Users.New do
   end
 
   @impl true
+  def handle_params(_params, uri, socket) do
+    {:noreply, assign(socket, :uri, uri)}
+  end
+
+  @impl true
   def handle_event("validate", %{"user" => user_params}, socket) do
     changeset =
       %User{}

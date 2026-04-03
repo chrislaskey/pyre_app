@@ -9,6 +9,7 @@ defmodule App.Accounts.UserToken do
   # It is very important to keep the login code expiry short,
   # since someone with access to the email may take over the account.
   @login_code_validity_in_minutes 5
+  @magic_link_validity_in_minutes 60
   @change_email_validity_in_days 7
   @session_validity_in_days 14
 
@@ -63,6 +64,42 @@ defmodule App.Accounts.UserToken do
         select: {%{user | authenticated_at: token.authenticated_at}, token.inserted_at}
 
     {:ok, query}
+  end
+
+  @doc """
+  Builds a magic link token for URL-based login.
+
+  Returns `{encoded_token, user_token}` where the encoded token is a
+  URL-safe base64 string sent to the user, and the hashed version is stored.
+  """
+  def build_magic_link_token(user) do
+    build_hashed_token(user, "login", user.email)
+  end
+
+  @doc """
+  Checks if the magic link token is valid and returns its underlying lookup query.
+
+  The query returns the user found by the token, if any.
+  The token is valid if it matches the hashed value in the database,
+  was sent to the user's current email, and has not expired.
+  """
+  def verify_magic_link_token_query(token) do
+    case Base.url_decode64(token, padding: false) do
+      {:ok, decoded_token} ->
+        hashed_token = :crypto.hash(@hash_algorithm, decoded_token)
+
+        query =
+          from token in by_token_and_context_query(hashed_token, "login"),
+            join: user in assoc(token, :user),
+            where: token.inserted_at > ago(@magic_link_validity_in_minutes, "minute"),
+            where: token.sent_to == user.email,
+            select: {user, token}
+
+        {:ok, query}
+
+      :error ->
+        :error
+    end
   end
 
   @doc """

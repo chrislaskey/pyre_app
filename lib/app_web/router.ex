@@ -29,6 +29,7 @@ defmodule AppWeb.Router do
       live "/users/settings", UserLive.Settings, :edit
       live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
 
+      live "/admin", Admin.Index, :index
       live "/admin/users", Admin.Users.Index, :index
       live "/admin/users/new", Admin.Users.New, :new
       live "/admin/users/:id", Admin.Users.Show, :show
@@ -45,6 +46,7 @@ defmodule AppWeb.Router do
       on_mount: [{AppWeb.UserAuth, :mount_current_scope}] do
       live "/users/log-in", UserLive.Login, :new
       live "/users/log-in/code", UserLive.LoginCode, :new
+      live "/users/log-in/:token", UserLive.MagicLink, :new
     end
 
     post "/users/log-in", UserSessionController, :create

@@ -1,0 +1,50 @@
+<Layouts.auth_page
+  flash={@flash}
+  current_page={:user}
+  prefix=""
+  uri={@uri}
+  breadcrumbs={[%{label: "Login", path: ~p"/users/log-in"}, %{label: "Code"}]}
+>
+  <div class="mx-auto max-w-sm space-y-4">
+    <div class="text-center">
+      <.header>
+        Enter your login code
+        <:subtitle>
+          We sent a 6-digit code to <strong>{@email}</strong>.
+          It expires in 5 minutes.
+        </:subtitle>
+      </.header>
+    </div>
+
+    <.form
+      for={@form}
+      id="login_code_form"
+      phx-submit="submit_code"
+      action={@form_action}
+      phx-trigger-action={@trigger_submit}
+    >
+      <input type="hidden" name={@form[:email].name} value={@email} />
+      <input :if={@remember_me} type="hidden" name={@form[:remember_me].name} value="true" />
+      <.input
+        field={@form[:code]}
+        type="text"
+        label="Login code"
+        inputmode="numeric"
+        autocomplete="one-time-code"
+        maxlength="6"
+        pattern="[0-9]{6}"
+        required
+        phx-mounted={JS.focus()}
+      />
+      <.button class="btn btn-primary w-full">
+        Verify code <span aria-hidden="true">→</span>
+      </.button>
+    </.form>
+
+    <p class="text-center text-sm">
+      <.link navigate={~p"/users/log-in"} class="link">
+        ← Back to login
+      </.link>
+    </p>
+  </div>
+</Layouts.auth_page>

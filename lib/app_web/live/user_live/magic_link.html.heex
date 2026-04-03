@@ -1,0 +1,38 @@
+<Layouts.auth_page
+  flash={@flash}
+  current_page={:user}
+  prefix=""
+  uri={@uri}
+  breadcrumbs={[%{label: "Login", path: ~p"/users/log-in"}, %{label: "Magic Link"}]}
+>
+  <div class="mx-auto max-w-sm space-y-4">
+    <div class="text-center">
+      <.header>
+        Log in
+        <:subtitle>
+          Logging in as <strong>{@user.email}</strong>.
+        </:subtitle>
+      </.header>
+    </div>
+
+    <.form
+      for={@form}
+      id="magic_link_form"
+      phx-submit="submit"
+      action={@form_action}
+      phx-trigger-action={@trigger_submit}
+    >
+      <input type="hidden" name={@form[:token].name} value={@token} />
+      <.input field={@form[:remember_me]} type="checkbox" label="Keep me logged in" />
+      <.button class="btn btn-primary w-full">
+        Log in <span aria-hidden="true">→</span>
+      </.button>
+    </.form>
+
+    <p class="text-center text-sm">
+      <.link navigate={~p"/users/log-in"} class="link">
+        ← Back to login
+      </.link>
+    </p>
+  </div>
+</Layouts.auth_page>

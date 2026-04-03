@@ -318,6 +318,66 @@ defmodule App.Accounts do
     UserNotifier.deliver_login_instructions(user, code)
   end
 
+  ## Magic link
+
+  @doc """
+  Gets the user with the given magic link token.
+  """
+  def get_user_by_magic_link_token(token) do
+    with {:ok, query} <- UserToken.verify_magic_link_token_query(token),
+         {user, _token} <- Repo.one(query) do
+      user
+    else
+      _ -> nil
+    end
+  end
+
+  @doc """
+  Logs the user in by magic link token.
+
+  Similar to `login_user_by_login_code/2`:
+  - Confirmed users: deletes the login token
+  - Unconfirmed users (no password): confirms and deletes all tokens
+  """
+  def login_user_by_magic_link(token) do
+    with {:ok, query} <- UserToken.verify_magic_link_token_query(token) do
+      case Repo.one(query) do
+        {%User{confirmed_at: nil, hashed_password: hash}, _token} when not is_nil(hash) ->
+          raise """
+          magic link log in is not allowed for unconfirmed users with a password set!
+
+          This cannot happen with the default implementation, which indicates that you
+          might have adapted the code to a different use case. Please make sure to read the
+          "Mixing magic link and password registration" section of `mix help phx.gen.auth`.
+          """
+
+        {%User{confirmed_at: nil} = user, _token} ->
+          user
+          |> User.confirm_changeset()
+          |> update_user_and_delete_all_tokens()
+
+        {user, token} ->
+          Repo.delete!(token)
+          {:ok, {user, []}}
+
+        nil ->
+          {:error, :not_found}
+      end
+    else
+      _ -> {:error, :not_found}
+    end
+  end
+
+  @doc """
+  Delivers magic link login instructions to the given user.
+  """
+  def deliver_magic_link_instructions(%User{} = user, url_fun)
+      when is_function(url_fun, 1) do
+    {encoded_token, user_token} = UserToken.build_magic_link_token(user)
+    Repo.insert!(user_token)
+    UserNotifier.deliver_magic_link_instructions(user, url_fun.(encoded_token))
+  end
+
   @doc """
   Deletes the signed token with the given context.
   """

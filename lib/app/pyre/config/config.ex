@@ -2,6 +2,8 @@ defmodule App.Pyre.Config do
   use Pyre.Config
   use PyreWeb.Config
 
+  import Phoenix.Component, only: [sigil_H: 2]
+
   # Callbacks - Pyre
 
   @impl Pyre.Config
@@ -24,5 +26,55 @@ defmodule App.Pyre.Config do
   @impl PyreWeb.Config
   def list_github_apps do
     App.Pyre.Config.GithubApps.list_github_apps()
+  end
+
+  @impl PyreWeb.Config
+  def additional_nav_links(assigns) do
+    ~H"""
+    <li>
+      <a href="/admin">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+          class="size-4"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M9.661 2.237a.531.531 0 0 1 .678 0 11.947 11.947 0 0 0 7.078 2.749.5.5 0 0 1 .479.425c.069.52.104 1.05.104 1.589 0 5.162-3.26 9.563-7.834 11.256a.48.48 0 0 1-.332 0C5.26 16.563 2 12.162 2 7c0-.538.035-1.069.104-1.589a.5.5 0 0 1 .48-.425 11.947 11.947 0 0 0 7.077-2.75Zm4.196 5.954a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        Admin
+      </a>
+    </li>
+    """
+  end
+
+  @impl PyreWeb.Config
+  def sidebar_footer(assigns) do
+    ~H"""
+    <div class="border-t border-base-300 pt-3 mt-3">
+      <ul class="menu w-full gap-y-1">
+        <li>
+          <div class="flex">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              class="size-4"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M9.661 2.237a.531.531 0 0 1 .678 0 11.947 11.947 0 0 0 7.078 2.749.5.5 0 0 1 .479.425c.069.52.104 1.05.104 1.589 0 5.162-3.26 9.563-7.834 11.256a.48.48 0 0 1-.332 0C5.26 16.563 2 12.162 2 7c0-.538.035-1.069.104-1.589a.5.5 0 0 1 .48-.425 11.947 11.947 0 0 0 7.077-2.75Zm4.196 5.954a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            <Phoenix.Component.link href="/users/settings">My Account</Phoenix.Component.link>
+          </div>
+        </li>
+      </ul>
+    </div>
+    """
   end
 end

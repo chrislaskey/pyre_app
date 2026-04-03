@@ -1,8 +1,20 @@
-<Layouts.app flash={@flash} current_scope={@current_scope}>
+<Layouts.app
+  flash={@flash}
+  current_scope={@current_scope}
+  current_page={:admin}
+  prefix=""
+  uri={@uri}
+  breadcrumbs={[
+    %{label: "Admin", path: ~p"/admin"},
+    %{label: "Users", path: ~p"/admin/users"},
+    %{label: "Show"}
+  ]}
+>
   <.header>
     User {@user.email}
     <:subtitle>User ID: {@user.id}</:subtitle>
     <:actions>
+      <.button phx-click="send_login_link">Send Login Link</.button>
       <.button navigate={~p"/admin/users/#{@user}/edit"}>Edit</.button>
     </:actions>
   </.header>

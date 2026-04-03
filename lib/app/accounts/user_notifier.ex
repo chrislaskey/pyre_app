@@ -39,6 +39,28 @@ defmodule App.Accounts.UserNotifier do
   end
 
   @doc """
+  Deliver instructions to log in with a magic link.
+  """
+  def deliver_magic_link_instructions(user, url) do
+    deliver(user.email, "Your login link", """
+
+    ==============================
+
+    Hi #{user.email},
+
+    You can log in by visiting the URL below:
+
+    #{url}
+
+    This link expires in 60 minutes.
+
+    If you didn't request this email, please ignore this.
+
+    ==============================
+    """)
+  end
+
+  @doc """
   Deliver instructions to log in with a login code.
   """
   def deliver_login_instructions(user, code) do

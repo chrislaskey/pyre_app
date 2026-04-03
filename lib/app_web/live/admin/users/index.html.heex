@@ -1,4 +1,11 @@
-<Layouts.app flash={@flash} current_scope={@current_scope}>
+<Layouts.app
+  flash={@flash}
+  current_scope={@current_scope}
+  current_page={:admin}
+  prefix=""
+  uri={@uri}
+  breadcrumbs={[%{label: "Admin", path: ~p"/admin"}, %{label: "Users"}]}
+>
   <.header>
     Users
     <:actions>
@@ -11,6 +18,9 @@
     <:col :let={user} label="Confirmed">
       {if user.confirmed_at, do: "Yes", else: "No"}
     </:col>
+    <:action :let={user}>
+      <.link phx-click="send_login_link" phx-value-id={user.id}>Send Login Link</.link>
+    </:action>
     <:action :let={user}>
       <.link navigate={~p"/admin/users/#{user}"}>Show</.link>
     </:action>

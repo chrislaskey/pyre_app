@@ -4,56 +4,6 @@ defmodule AppWeb.UserLive.LoginCode do
   alias App.Accounts
 
   @impl true
-  def render(assigns) do
-    ~H"""
-    <Layouts.app flash={@flash} current_scope={@current_scope}>
-      <div class="mx-auto max-w-sm space-y-4">
-        <div class="text-center">
-          <.header>
-            Enter your login code
-            <:subtitle>
-              We sent a 6-digit code to <strong>{@email}</strong>.
-              It expires in 5 minutes.
-            </:subtitle>
-          </.header>
-        </div>
-
-        <.form
-          for={@form}
-          id="login_code_form"
-          phx-submit="submit_code"
-          action={@form_action}
-          phx-trigger-action={@trigger_submit}
-        >
-          <input type="hidden" name={@form[:email].name} value={@email} />
-          <input :if={@remember_me} type="hidden" name={@form[:remember_me].name} value="true" />
-          <.input
-            field={@form[:code]}
-            type="text"
-            label="Login code"
-            inputmode="numeric"
-            autocomplete="one-time-code"
-            maxlength="6"
-            pattern="[0-9]{6}"
-            required
-            phx-mounted={JS.focus()}
-          />
-          <.button class="btn btn-primary w-full">
-            Verify code <span aria-hidden="true">→</span>
-          </.button>
-        </.form>
-
-        <p class="text-center text-sm">
-          <.link navigate={~p"/users/log-in"} class="link">
-            ← Back to login
-          </.link>
-        </p>
-      </div>
-    </Layouts.app>
-    """
-  end
-
-  @impl true
   def mount(_params, _session, socket) do
     email = Phoenix.Flash.get(socket.assigns.flash, :login_email)
     remember_me = Phoenix.Flash.get(socket.assigns.flash, :login_remember_me) || false
@@ -75,6 +25,11 @@ defmodule AppWeb.UserLive.LoginCode do
        |> put_flash(:error, "Please enter your email first.")
        |> push_navigate(to: ~p"/users/log-in")}
     end
+  end
+
+  @impl true
+  def handle_params(_params, uri, socket) do
+    {:noreply, assign(socket, :uri, uri)}
   end
 
   @impl true

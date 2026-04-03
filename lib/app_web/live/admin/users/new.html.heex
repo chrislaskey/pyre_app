@@ -1,4 +1,15 @@
-<Layouts.app flash={@flash} current_scope={@current_scope}>
+<Layouts.app
+  flash={@flash}
+  current_scope={@current_scope}
+  current_page={:admin}
+  prefix=""
+  uri={@uri}
+  breadcrumbs={[
+    %{label: "Admin", path: ~p"/admin"},
+    %{label: "Users", path: ~p"/admin/users"},
+    %{label: "Show"}
+  ]}
+>
   <.header>
     New User
     <:subtitle>Create a new user account</:subtitle>
