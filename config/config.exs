@@ -51,6 +51,12 @@ config :jido_ai,
     advanced: "anthropic:claude-opus-4-20250514"
   }
 
+# Oban
+config :app, Oban,
+  engine: Oban.Engines.Lite,
+  repo: App.Repo,
+  queues: [default: 10]
+
 # Configure the mailer
 #
 # By default it uses the "Local" adapter which stores the emails

@@ -74,7 +74,8 @@ defmodule App.MixProject do
       {:pyre_web, git: "https://github.com/chrislaskey/pyre_web", branch: "main"},
 
       # Additional deps
-      {:dotenvy, "~> 1.1.0"}
+      {:dotenvy, "~> 1.1.0"},
+      {:oban, "~> 2.18"}
     ]
   end
 
