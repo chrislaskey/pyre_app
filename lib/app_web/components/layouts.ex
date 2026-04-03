@@ -40,7 +40,17 @@ defmodule AppWeb.Layouts do
 
   def app(assigns) do
     ~H"""
+    <PyreWeb.Components.Layouts.page_header_container>
+      <div class="flex items-center gap-x-2">
+        <PyreWeb.Components.Layouts.mobile_menu_button uri={@uri} />
+        <PyreWeb.Components.Layouts.page_header_logo prefix="/" />
+      </div>
+      <div class="flex items-center gap-x-1">
+        <PyreWeb.Components.Layouts.theme_selector />
+      </div>
+    </PyreWeb.Components.Layouts.page_header_container>
     <.flash_group flash={@flash} />
+    <PyreWeb.Components.Layouts.mobile_menu current_page={@current_page} prefix={@prefix} uri={@uri} />
     <div class="flex flex-1">
       <PyreWeb.Components.Layouts.sidebar current_page={@current_page} prefix={@prefix} uri={@uri} />
       <div class="flex-1 p-8 overflow-y-auto">
@@ -72,7 +82,17 @@ defmodule AppWeb.Layouts do
 
   def auth_page(assigns) do
     ~H"""
+    <PyreWeb.Components.Layouts.page_header_container>
+      <div class="flex items-center gap-x-2">
+        <PyreWeb.Components.Layouts.mobile_menu_button uri={@uri} />
+        <PyreWeb.Components.Layouts.page_header_logo prefix="/" />
+      </div>
+      <div class="flex items-center gap-x-1">
+        <PyreWeb.Components.Layouts.theme_selector />
+      </div>
+    </PyreWeb.Components.Layouts.page_header_container>
     <.flash_group flash={@flash} />
+    <PyreWeb.Components.Layouts.mobile_menu current_page={@current_page} prefix={@prefix} uri={@uri} />
     <div class="flex flex-1">
       <div class="flex-1 p-8 overflow-y-auto">
         <PyreWeb.Components.Layouts.breadcrumbs items={@breadcrumbs} prefix={@prefix} />
