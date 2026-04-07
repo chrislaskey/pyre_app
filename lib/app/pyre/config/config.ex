@@ -9,6 +9,13 @@ defmodule App.Pyre.Config do
     :ok
   end
 
+  @impl Pyre.Config
+  def list_llm_backends do
+    custom_llm_backends = maybe_custom_config(App.Pyre.Config.Custom, :list_llm_backends, [], [])
+
+    Pyre.Config.included_llm_backends() ++ custom_llm_backends
+  end
+
   # Callbacks - PyreWeb
 
   @impl PyreWeb.Config
@@ -34,5 +41,16 @@ defmodule App.Pyre.Config do
   @impl PyreWeb.Config
   def sidebar_footer(assigns) do
     App.Pyre.Config.Web.sidebar_footer(assigns)
+  end
+
+  # Config helpers
+
+  def maybe_custom_config(module, function, args, default) do
+    if Code.ensure_loaded?(module) and
+      function_exported?(module, function, length(args)) do
+      apply(module, function, args)
+    else
+      default
+    end
   end
 end

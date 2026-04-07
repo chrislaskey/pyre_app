@@ -41,3 +41,12 @@ npm-debug.log
 
 # Environmental variables
 env/*.env
+
+# Custom configs
+lib/app/pyre/config/custom/*
+!lib/app/pyre/config/custom/.gitkeep
+
+# LLM directories
+.claude
+.codex
+.cursor
