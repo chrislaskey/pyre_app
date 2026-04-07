@@ -59,12 +59,6 @@ defmodule AppWeb.Router do
     post "/users/update-password", UserSessionController, :update_password
   end
 
-  scope "/", AppWeb do
-    pipe_through :browser
-
-    get "/home", PageController, :home
-  end
-
   scope "/" do
     pipe_through :browser
     pipe_through :require_authenticated_user

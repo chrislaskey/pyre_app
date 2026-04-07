@@ -3,7 +3,6 @@ defmodule App.Pyre.Config.Web do
 
   @moduledoc "PyreWeb.Config Callbacks"
 
-  @impl PyreWeb.Config
   def additional_nav_links(assigns) do
     ~H"""
     <li>
@@ -26,7 +25,6 @@ defmodule App.Pyre.Config.Web do
     """
   end
 
-  @impl PyreWeb.Config
   def sidebar_footer(assigns) do
     ~H"""
     <div class="border-t border-base-300 pt-3 mt-3">
