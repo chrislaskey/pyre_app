@@ -10,6 +10,10 @@
     My account
   </.header>
 
+  <div :if={@current_scope && @current_scope.user} class="mb-4">
+    Currently logged in as <span class="font-medium">{@current_scope.user.email}</span>
+  </div>
+
   <div class="grid gap-4 max-w-2xl">
     <.link
       navigate={~p"/users/settings"}
