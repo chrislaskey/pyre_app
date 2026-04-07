@@ -3,6 +3,7 @@ defmodule AppWeb.Router do
 
   import AppWeb.UserAuth
 
+  import Phoenix.LiveDashboard.Router
   import PyreWeb.Router
 
   pipeline :browser do
@@ -22,7 +23,24 @@ defmodule AppWeb.Router do
   ## Authentication routes
 
   scope "/", AppWeb do
-    pipe_through [:browser, :require_authenticated_user]
+    pipe_through :browser
+
+    live_session :current_user,
+      on_mount: [{AppWeb.UserAuth, :mount_current_scope}] do
+      live "/users/log-in", UserLive.Login, :new
+      live "/users/log-in/code", UserLive.LoginCode, :new
+      live "/users/log-in/:token", UserLive.MagicLink, :new
+    end
+
+    post "/users/log-in", UserSessionController, :create
+    delete "/users/log-out", UserSessionController, :delete
+  end
+
+  ## App routes
+
+  scope "/", AppWeb do
+    pipe_through :browser
+    pipe_through :require_authenticated_user
 
     live_session :require_authenticated_user,
       on_mount: [{AppWeb.UserAuth, :require_authenticated}] do
@@ -40,20 +58,6 @@ defmodule AppWeb.Router do
   end
 
   scope "/", AppWeb do
-    pipe_through [:browser]
-
-    live_session :current_user,
-      on_mount: [{AppWeb.UserAuth, :mount_current_scope}] do
-      live "/users/log-in", UserLive.Login, :new
-      live "/users/log-in/code", UserLive.LoginCode, :new
-      live "/users/log-in/:token", UserLive.MagicLink, :new
-    end
-
-    post "/users/log-in", UserSessionController, :create
-    delete "/users/log-out", UserSessionController, :delete
-  end
-
-  scope "/", AppWeb do
     pipe_through :browser
 
     get "/home", PageController, :home
@@ -61,28 +65,19 @@ defmodule AppWeb.Router do
 
   scope "/" do
     pipe_through :browser
+    pipe_through :require_authenticated_user
+
+    live_dashboard "/live-dashboard", metrics: AppWeb.Telemetry
 
     pyre_web("/")
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", AppWeb do
-  #   pipe_through :api
-  # end
+  ## Development routes
 
-  # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:app, :dev_routes) do
-    # If you want to use the LiveDashboard in production, you should put
-    # it behind authentication and allow only admins to access it.
-    # If your application does not have an admins-only section yet,
-    # you can use Plug.BasicAuth to set up some basic authentication
-    # as long as you are also using SSL (which you should anyway).
-    import Phoenix.LiveDashboard.Router
-
     scope "/dev" do
       pipe_through :browser
 
-      live_dashboard "/dashboard", metrics: AppWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
   end
