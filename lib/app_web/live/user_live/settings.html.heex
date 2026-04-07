@@ -4,14 +4,12 @@
   current_page={:user}
   prefix=""
   uri={@uri}
-  breadcrumbs={[%{label: "Users"}, %{label: "Settings"}]}
+  breadcrumbs={[%{label: "Users", path: "/users"}, %{label: "Settings"}]}
 >
-  <div class="text-center">
-    <.header>
-      Account Settings
-      <:subtitle>Manage your account email address and password settings</:subtitle>
-    </.header>
-  </div>
+  <.header>
+    Account Settings
+    <:subtitle>Manage your account email address and password settings</:subtitle>
+  </.header>
 
   <.form for={@email_form} id="email_form" phx-submit="update_email" phx-change="validate_email">
     <.input

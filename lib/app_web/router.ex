@@ -33,6 +33,7 @@ defmodule AppWeb.Router do
     end
 
     post "/users/log-in", UserSessionController, :create
+    get "/users/log-out", UserSessionController, :delete
     delete "/users/log-out", UserSessionController, :delete
   end
 
@@ -44,6 +45,7 @@ defmodule AppWeb.Router do
 
     live_session :require_authenticated_user,
       on_mount: [{AppWeb.UserAuth, :require_authenticated}] do
+      live "/users", UserLive.Index, :index
       live "/users/settings", UserLive.Settings, :edit
       live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
 

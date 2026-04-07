@@ -59,4 +59,8 @@ defmodule AppWeb.UserLive.LoginCode do
          )}
     end
   end
+
+  def local_mail_adapter? do
+    Application.get_env(:app, App.Mailer)[:adapter] == Swoosh.Adapters.Local
+  end
 end

@@ -42,8 +42,4 @@ defmodule AppWeb.UserLive.Login do
          |> push_navigate(to: ~p"/users/log-in/code")}
     end
   end
-
-  defp local_mail_adapter? do
-    Application.get_env(:app, App.Mailer)[:adapter] == Swoosh.Adapters.Local
-  end
 end
