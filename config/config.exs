@@ -55,7 +55,16 @@ config :jido_ai,
 config :app, Oban,
   engine: Oban.Engines.Lite,
   repo: App.Repo,
-  queues: [default: 10]
+  queues: [
+    default: 10,
+    # One queue per workflow type — must match Pyre.Config.list_workflows()
+    workflows_chat: [limit: 1, paused: true],
+    workflows_feature: [limit: 1, paused: true],
+    workflows_prototype: [limit: 1, paused: true],
+    workflows_task: [limit: 1, paused: true],
+    workflows_code_review: [limit: 1, paused: true],
+    workflows_overnight_feature: [limit: 1, paused: true]
+  ]
 
 # Configure the mailer
 #

@@ -16,6 +16,7 @@ defmodule App.Application do
       {Phoenix.PubSub, name: App.PubSub},
       PyreWeb.Presence,
       {Oban, Application.fetch_env!(:app, Oban)},
+      App.Pyre.Workers.QueueManager,
       # Start to serve requests, typically the last entry
       AppWeb.Endpoint
     ]

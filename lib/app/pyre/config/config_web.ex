@@ -3,6 +3,27 @@ defmodule App.Pyre.Config.Web do
 
   @moduledoc "PyreWeb.Config Callbacks"
 
+  def render_run(assigns) do
+    run = assigns[:run]
+
+    if run && run[:connection_id] do
+      assigns = Phoenix.Component.assign(assigns, :run, run)
+
+      ~H"""
+      <div class="mb-4 flex items-center gap-3 text-sm text-base-content/60">
+        <span :if={@run[:connection_id]}>
+          Worker: <span class="font-mono">{@run.connection_id}</span>
+        </span>
+        <span :if={@run[:queued_at]}>
+          Queued: {Calendar.strftime(@run.queued_at, "%H:%M:%S")}
+        </span>
+      </div>
+      """
+    else
+      ~H""
+    end
+  end
+
   def additional_nav_links(assigns) do
     ~H"""
     <li>
