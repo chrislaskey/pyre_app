@@ -102,27 +102,27 @@ defmodule App.Pyre.Workers.QueueManager do
   defp compute_capacity_by_type(connections) do
     all_types = apply(Pyre.Config, :list_workflows, []) |> Enum.map(&to_string(&1.name))
 
-    Enum.reduce(connections, %{}, fn meta, acc ->
-      enabled = meta["enabled_workflows"] || meta[:enabled_workflows] || []
-      capacity = meta["available_capacity"] || meta[:available_capacity] || 0
-      status = meta["status"] || meta[:status] || "active"
+    connections
+    |> Enum.filter(&active_with_capacity?/1)
+    |> Enum.reduce(%{}, fn meta, acc ->
+      credit_capacity(meta, all_types, acc)
+    end)
+  end
 
-      if status != "active" or capacity <= 0 do
-        acc
-      else
-        types_to_credit =
-          if enabled == [] do
-            # General-purpose client: credit all workflow types
-            all_types
-          else
-            # Specialist: credit only declared types
-            enabled
-          end
+  defp active_with_capacity?(meta) do
+    capacity = meta["available_capacity"] || meta[:available_capacity] || 0
+    status = meta["status"] || meta[:status] || "active"
+    status == "active" and capacity > 0
+  end
 
-        Enum.reduce(types_to_credit, acc, fn type, inner_acc ->
-          Map.update(inner_acc, type, capacity, &(&1 + capacity))
-        end)
-      end
+  defp credit_capacity(meta, all_types, acc) do
+    enabled = meta["enabled_workflows"] || meta[:enabled_workflows] || []
+    capacity = meta["available_capacity"] || meta[:available_capacity] || 0
+    # General-purpose clients credit all types; specialists credit only declared types
+    types_to_credit = if enabled == [], do: all_types, else: enabled
+
+    Enum.reduce(types_to_credit, acc, fn type, inner_acc ->
+      Map.update(inner_acc, type, capacity, &(&1 + capacity))
     end)
   end
 end

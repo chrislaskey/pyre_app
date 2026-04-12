@@ -50,21 +50,28 @@ defmodule App.Workers.WorkflowJob do
     workflow_type = opts["workflow"]
 
     PyreWeb.Presence.list_connections()
-    |> Enum.filter(fn meta ->
-      available = meta["available_capacity"] || meta[:available_capacity] || 0
-      status = meta["status"] || meta[:status] || "active"
-      backends = meta["backends"] || meta[:backends] || []
-      enabled = meta["enabled_workflows"] || meta[:enabled_workflows] || []
+    |> Enum.filter(&compatible_worker?(&1, required_backend, workflow_type))
+    |> Enum.max_by(&worker_capacity/1, fn -> nil end)
+  end
 
-      status == "active" and
-        available > 0 and
-        (required_backend == nil or required_backend in backends) and
-        (enabled == [] or workflow_type in enabled)
-    end)
-    |> Enum.max_by(
-      fn meta -> meta["available_capacity"] || meta[:available_capacity] || 0 end,
-      fn -> nil end
-    )
+  defp compatible_worker?(meta, required_backend, workflow_type) do
+    worker_status(meta) == "active" and
+      worker_capacity(meta) > 0 and
+      backend_matches?(meta, required_backend) and
+      workflow_matches?(meta, workflow_type)
+  end
+
+  defp worker_capacity(meta), do: meta["available_capacity"] || meta[:available_capacity] || 0
+  defp worker_status(meta), do: meta["status"] || meta[:status] || "active"
+  defp worker_backends(meta), do: meta["backends"] || meta[:backends] || []
+  defp worker_enabled_workflows(meta), do: meta["enabled_workflows"] || meta[:enabled_workflows] || []
+
+  defp backend_matches?(_meta, nil), do: true
+  defp backend_matches?(meta, required), do: required in worker_backends(meta)
+
+  defp workflow_matches?(meta, type) do
+    enabled = worker_enabled_workflows(meta)
+    enabled == [] or type in enabled
   end
 
   defp dispatch_and_run(run, run_id, worker, description, workflow_params) do

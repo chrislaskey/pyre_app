@@ -47,32 +47,35 @@ defmodule App.Seeds.Accounts do
   defp create_user(email, password) do
     case Accounts.get_user_by_email(email) do
       nil ->
-        result =
-          Repo.transact(fn ->
-            with {:ok, user} <- Accounts.register_user(%{email: email}),
-                 {:ok, user} <- confirm_user(user),
-                 {:ok, {user, _tokens}} <-
-                   Accounts.update_user_password(user, %{password: password}) do
-              {:ok, user}
-            end
-          end)
-
-        case result do
-          {:ok, user} ->
-            Logger.info("Seeds.Accounts: created user #{user.email}")
-
-          {:error, changeset} ->
-            Logger.error(
-              "Seeds.Accounts: failed to create user #{email}: #{inspect(changeset.errors)}"
-            )
-        end
-
+        result = register_and_set_password(email, password)
+        log_create_result(result, email)
         result
 
       _user ->
         Logger.debug("Seeds.Accounts: user #{email} already exists, skipping")
         :ok
     end
+  end
+
+  defp register_and_set_password(email, password) do
+    Repo.transact(fn ->
+      with {:ok, user} <- Accounts.register_user(%{email: email}),
+           {:ok, user} <- confirm_user(user),
+           {:ok, {user, _tokens}} <-
+             Accounts.update_user_password(user, %{password: password}) do
+        {:ok, user}
+      end
+    end)
+  end
+
+  defp log_create_result({:ok, user}, _email) do
+    Logger.info("Seeds.Accounts: created user #{user.email}")
+  end
+
+  defp log_create_result({:error, changeset}, email) do
+    Logger.error(
+      "Seeds.Accounts: failed to create user #{email}: #{inspect(changeset.errors)}"
+    )
   end
 
   defp confirm_user(user) do

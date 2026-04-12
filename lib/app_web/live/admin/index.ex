@@ -1,4 +1,5 @@
 defmodule AppWeb.Admin.Index do
+  @moduledoc false
   use AppWeb, :live_view
 
   @impl true

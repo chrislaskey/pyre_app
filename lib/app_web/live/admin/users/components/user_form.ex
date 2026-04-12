@@ -1,4 +1,5 @@
 defmodule AppWeb.Admin.Users.UserForm do
+  @moduledoc false
   use AppWeb, :html
 
   attr :form, Phoenix.HTML.Form, required: true

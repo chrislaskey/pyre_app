@@ -1,4 +1,5 @@
 defmodule App.Pyre.Config do
+  @moduledoc false
   use Pyre.Config
   use PyreWeb.Config
 

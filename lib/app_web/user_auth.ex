@@ -1,4 +1,5 @@
 defmodule AppWeb.UserAuth do
+  @moduledoc false
   use AppWeb, :verified_routes
 
   import Plug.Conn
