@@ -5,7 +5,8 @@ This application is a standalone implementation of the [Pyre](https://github.com
 
 ## Adding code
 
-When generating LiveView pages, do not use `render` methods but instead create separate `*.html.heex` files.
+- Check if the latest `pyre` and `pyre_web` libraries are installed using the command `mix deps.unlock pyre pyre_web && mix deps.get`
+- When generating LiveView pages, do not use `render` methods but instead create separate `*.html.heex` files.
 
 <!-- phoenix-gen-auth-start -->
 ## Authentication
