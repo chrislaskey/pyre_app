@@ -64,6 +64,19 @@ defmodule App.Pyre.Runs do
     end
   end
 
+  def stop(run_id) do
+    apply(Pyre.RunServer, :stop_run, [run_id])
+
+    case get_by_run_id(run_id) do
+      %Run{} = run ->
+        if run.oban_job_id, do: Oban.cancel_job(run.oban_job_id)
+        update_status(run, :stopped)
+
+      nil ->
+        :ok
+    end
+  end
+
   def update_status(run, status, attrs \\ %{}) do
     case run |> Run.changeset(Map.put(attrs, :status, status)) |> Repo.update() do
       {:ok, updated} ->
