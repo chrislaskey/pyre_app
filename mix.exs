@@ -76,6 +76,7 @@ defmodule App.MixProject do
       # Additional deps
       {:dotenvy, "~> 1.1.0"},
       {:oban, "~> 2.18"},
+      {:oban_web, "~> 2.11"},
 
       # Development and test packages
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false}

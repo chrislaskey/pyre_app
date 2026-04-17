@@ -38,6 +38,11 @@ defmodule App.Pyre.Config do
   end
 
   @impl PyreWeb.Config
+  def list_runs do
+    App.Pyre.Runs.list_with_live_state()
+  end
+
+  @impl PyreWeb.Config
   def get_run(run_id) do
     instance_data = apply(Pyre.RunServer, :get_state, [run_id])
     database_data = App.Pyre.Runs.get_by_run_id(run_id)

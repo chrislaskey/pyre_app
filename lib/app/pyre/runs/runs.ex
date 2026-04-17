@@ -21,6 +21,29 @@ defmodule App.Pyre.Runs do
     |> Repo.all()
   end
 
+  def list_with_live_state(limit \\ 50) do
+    live_runs = Map.new(apply(Pyre.RunServer, :list_runs, []), &{&1.id, &1})
+
+    list_recent(limit)
+    |> Enum.map(fn run ->
+      case Map.get(live_runs, run.run_id) do
+        %{} = live ->
+          Map.merge(live, %{id: run.run_id, queued_at: run.inserted_at})
+
+        nil ->
+          %{
+            id: run.run_id,
+            status: run.status,
+            feature: nil,
+            phase: nil,
+            feature_description: run.description,
+            started_at: run.started_at,
+            queued_at: run.inserted_at
+          }
+      end
+    end)
+  end
+
   def create_and_enqueue(run_id, description, opts) do
     {workflow_type, serialized_opts} = serialize_workflow_params(opts)
 
