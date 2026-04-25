@@ -17,6 +17,9 @@ defmodule App.Application do
       PyreWeb.Presence,
       {Oban, Application.fetch_env!(:app, Oban)},
       App.Pyre.Workers.QueueManager,
+      PyreClient.Session.Registry,
+      PyreClient.Runner,
+      PyreClient.Connection,
       # Start to serve requests, typically the last entry
       AppWeb.Endpoint
     ]

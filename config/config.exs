@@ -35,12 +35,15 @@ config :app, AppWeb.Endpoint,
   pubsub_server: App.PubSub,
   live_view: [signing_salt: "pXRLy6ce"]
 
-# Pyre
+# Pyre lib
 
 config :pyre, :pubsub, App.PubSub
 
 config :pyre, config: App.Pyre.Config
-config :pyre_web, config: App.Pyre.Config
+
+# Pyre client
+
+config :pyre_client, llm_backend: :claude_cli
 
 # Jido
 
@@ -55,6 +58,7 @@ config :jido_ai,
 config :app, Oban,
   engine: Oban.Engines.Lite,
   repo: App.Repo,
+  plugins: [Oban.Met],
   queues: [
     default: 10,
     # One queue per workflow type — must match Pyre.Config.list_workflows()

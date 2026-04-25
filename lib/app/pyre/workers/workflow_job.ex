@@ -64,7 +64,9 @@ defmodule App.Workers.WorkflowJob do
   defp worker_capacity(meta), do: meta["available_capacity"] || meta[:available_capacity] || 0
   defp worker_status(meta), do: meta["status"] || meta[:status] || "active"
   defp worker_backends(meta), do: meta["backends"] || meta[:backends] || []
-  defp worker_enabled_workflows(meta), do: meta["enabled_workflows"] || meta[:enabled_workflows] || []
+
+  defp worker_enabled_workflows(meta),
+    do: meta["enabled_workflows"] || meta[:enabled_workflows] || []
 
   defp backend_matches?(_meta, nil), do: true
   defp backend_matches?(meta, required), do: required in worker_backends(meta)
@@ -91,10 +93,8 @@ defmodule App.Workers.WorkflowJob do
         "pyre:action:input:#{connection_id}",
         {:action, execution_id,
          %{
-           type: "workflow",
-           run_id: run_id,
-           description: description,
-           workflow_params: workflow_params
+           "action" => "reserve",
+           "run_id" => run_id
          }}
       )
     end
@@ -102,7 +102,13 @@ defmodule App.Workers.WorkflowJob do
     # Await client ack
     case await_ack(execution_id, @ack_timeout) do
       {:ok, :accepted} ->
-        start_run(run, run_id, description, workflow_params)
+        try do
+          start_run(run, run_id, description, workflow_params, connection_id, execution_id)
+        after
+          # Always release the client's capacity reservation, regardless of
+          # whether the workflow succeeded, failed, or crashed.
+          release_reservation(connection_id, execution_id)
+        end
 
       {:ok, :rejected} ->
         # Client rejected (at capacity). Snooze and retry with a
@@ -123,14 +129,17 @@ defmodule App.Workers.WorkflowJob do
     end
   end
 
-  defp start_run(run, run_id, _description, workflow_params) do
+  defp start_run(run, run_id, _description, workflow_params, connection_id, reservation_id) do
     opts = Runs.deserialize_workflow_params(workflow_params)
 
     Runs.update_status(run, :running, %{
       started_at: DateTime.utc_now()
     })
 
-    case apply(Pyre.RunServer, :start_run, [run.description, [id: run_id] ++ opts]) do
+    case apply(Pyre.RunServer, :start_run, [
+           run.description,
+           [id: run_id, connection_id: connection_id, reservation_id: reservation_id] ++ opts
+         ]) do
       {:ok, ^run_id} ->
         # RunServer is now running. Block until it completes.
         case await_run_completion(run_id) do
@@ -157,6 +166,16 @@ defmodule App.Workers.WorkflowJob do
         })
 
         {:error, reason}
+    end
+  end
+
+  defp release_reservation(connection_id, execution_id) do
+    if pubsub = Application.get_env(:pyre, :pubsub) do
+      Phoenix.PubSub.broadcast(
+        pubsub,
+        "pyre:action:input:#{connection_id}",
+        {:action_finish, execution_id}
+      )
     end
   end
 

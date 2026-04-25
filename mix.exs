@@ -70,8 +70,8 @@ defmodule App.MixProject do
       {:bandit, "~> 1.5"},
 
       # Pyre deps
-      {:pyre, git: "https://github.com/chrislaskey/pyre", branch: "main"},
-      {:pyre_web, git: "https://github.com/chrislaskey/pyre_web", branch: "main"},
+      {:pyre, path: "../pyre_lib"},
+      {:pyre_client, path: "../pyre_client"},
 
       # Additional deps
       {:dotenvy, "~> 1.1.0"},
@@ -79,6 +79,7 @@ defmodule App.MixProject do
       {:oban_web, "~> 2.11"},
 
       # Development and test packages
+      {:tidewave, "~> 0.1", only: :dev},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end

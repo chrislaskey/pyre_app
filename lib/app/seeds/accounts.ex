@@ -73,9 +73,7 @@ defmodule App.Seeds.Accounts do
   end
 
   defp log_create_result({:error, changeset}, email) do
-    Logger.error(
-      "Seeds.Accounts: failed to create user #{email}: #{inspect(changeset.errors)}"
-    )
+    Logger.error("Seeds.Accounts: failed to create user #{email}: #{inspect(changeset.errors)}")
   end
 
   defp confirm_user(user) do

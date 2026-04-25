@@ -125,7 +125,6 @@ defmodule App.Pyre.Runs do
 
   The opts keyword list from pyre_web contains:
   - `:workflow` - atom -> string
-  - `:llm` - module atom -> string via Pyre.Config.backend_name_for_module/1
   - `:skipped_stages` - atom list -> string list
   - `:interactive_stages` - atom list -> string list
   - `:attachments` - binary content -> base64 encoded
@@ -134,14 +133,8 @@ defmodule App.Pyre.Runs do
   def serialize_workflow_params(opts) do
     workflow_type = opts[:workflow] |> to_string()
 
-    llm_name =
-      if opts[:llm] do
-        apply(Pyre.Config, :backend_name_for_module, [opts[:llm]])
-      end
-
     serialized = %{
       "workflow" => workflow_type,
-      "llm" => llm_name,
       "skipped_stages" => Enum.map(opts[:skipped_stages] || [], &to_string/1),
       "interactive_stages" => Enum.map(opts[:interactive_stages] || [], &to_string/1),
       "feature" => opts[:feature],
@@ -165,13 +158,6 @@ defmodule App.Pyre.Runs do
   def deserialize_workflow_params(workflow_params) do
     opts = Jason.decode!(workflow_params)
 
-    llm_module =
-      if opts["llm"] do
-        apply(Pyre.Config, :get_llm_backend, [opts["llm"]])
-      else
-        apply(Pyre.LLM, :default, [])
-      end
-
     # Use String.to_atom/1 instead of String.to_existing_atom/1 because
     # Oban jobs may be retried after a deploy that changes workflow/stage
     # names. If the atom no longer exists, to_existing_atom raises.
@@ -179,7 +165,6 @@ defmodule App.Pyre.Runs do
     # credo:disable-for-next-line Credo.Check.Warning.UnsafeToAtom
     [
       workflow: String.to_atom(opts["workflow"]),
-      llm: llm_module,
       # credo:disable-for-next-line Credo.Check.Warning.UnsafeToAtom
       skipped_stages: Enum.map(opts["skipped_stages"] || [], &String.to_atom/1),
       # credo:disable-for-next-line Credo.Check.Warning.UnsafeToAtom

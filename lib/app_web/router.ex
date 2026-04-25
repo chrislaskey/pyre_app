@@ -65,7 +65,7 @@ defmodule AppWeb.Router do
     pipe_through :require_authenticated_user
 
     live_dashboard "/live-dashboard", metrics: AppWeb.Telemetry
-    oban_dashboard "/oban"
+    oban_dashboard("/oban")
 
     pyre_web("/")
   end

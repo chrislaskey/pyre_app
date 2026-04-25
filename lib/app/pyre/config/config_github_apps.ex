@@ -12,7 +12,7 @@ defmodule App.Pyre.Config.GithubApps do
 
   def list_github_apps do
     db_apps = App.Pyre.GithubApps.list() |> Enum.map(&to_config_map/1)
-    env_apps = PyreWeb.Config.list_github_apps_from_env()
+    env_apps = Pyre.Config.list_github_apps_from_env()
     merge_apps(db_apps, env_apps)
   end
 

@@ -34,7 +34,7 @@ end
 
 config :app, AppWeb.Endpoint, http: [port: env!("PORT", :integer, 4000)]
 
-# Pyre
+# Pyre lib
 
 if env!("PYRE_GITHUB_REPO_URL", :string, nil) do
   config :pyre, :github,
@@ -62,6 +62,15 @@ config :pyre, :github_apps, [
     ]
   end
 ]
+
+# Pyre client
+
+config :pyre_client,
+  server_url: "ws://localhost:#{env!("PORT", :string, "4000")}/websocket",
+  connection_id: env!("PYRE_CLIENT_CONNECTION_ID", :string, "local-worker"),
+  connection_name: env!("PYRE_CLIENT_CONNECTION_NAME", :string, "local"),
+  available_capacity: 1,
+  enabled_workflows: []
 
 if paths = env!("PYRE_ALLOWED_PATHS", :string, nil) do
   config :pyre,

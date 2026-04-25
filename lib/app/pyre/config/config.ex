@@ -1,9 +1,6 @@
 defmodule App.Pyre.Config do
   @moduledoc false
   use Pyre.Config
-  use PyreWeb.Config
-
-  # Callbacks - Pyre
 
   @impl Pyre.Config
   def after_flow_complete(%Pyre.Events.FlowCompleted{} = _event) do
@@ -11,15 +8,6 @@ defmodule App.Pyre.Config do
   end
 
   @impl Pyre.Config
-  def list_llm_backends do
-    custom_llm_backends = maybe_custom_config(App.Pyre.Config.Custom, :list_llm_backends, [], [])
-
-    Pyre.Config.included_llm_backends() ++ custom_llm_backends
-  end
-
-  # Callbacks - PyreWeb
-
-  @impl PyreWeb.Config
   def run_submit(description, opts) do
     run_id = apply(Pyre.RunServer, :generate_id, [])
 
@@ -32,17 +20,17 @@ defmodule App.Pyre.Config do
     end
   end
 
-  @impl PyreWeb.Config
+  @impl Pyre.Config
   def run_stop(run_id) do
     App.Pyre.Runs.stop(run_id)
   end
 
-  @impl PyreWeb.Config
+  @impl Pyre.Config
   def list_runs do
     App.Pyre.Runs.list_with_live_state()
   end
 
-  @impl PyreWeb.Config
+  @impl Pyre.Config
   def get_run(run_id) do
     instance_data = apply(Pyre.RunServer, :get_state, [run_id])
     database_data = App.Pyre.Runs.get_by_run_id(run_id)
@@ -91,32 +79,32 @@ defmodule App.Pyre.Config do
     end
   end
 
-  @impl PyreWeb.Config
+  @impl Pyre.Config
   def render_run(assigns) do
     App.Pyre.Config.Web.render_run(assigns)
   end
 
-  @impl PyreWeb.Config
+  @impl Pyre.Config
   def authorize_socket_connect(_params, _connect_info) do
     :ok
   end
 
-  @impl PyreWeb.Config
+  @impl Pyre.Config
   def update_github_app(credentials) do
     App.Pyre.Config.GithubApps.update_github_app(credentials)
   end
 
-  @impl PyreWeb.Config
+  @impl Pyre.Config
   def list_github_apps do
     App.Pyre.Config.GithubApps.list_github_apps()
   end
 
-  @impl PyreWeb.Config
+  @impl Pyre.Config
   def additional_nav_links(assigns) do
     App.Pyre.Config.Web.additional_nav_links(assigns)
   end
 
-  @impl PyreWeb.Config
+  @impl Pyre.Config
   def sidebar_footer(assigns) do
     App.Pyre.Config.Web.sidebar_footer(assigns)
   end

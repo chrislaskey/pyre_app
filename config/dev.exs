@@ -85,5 +85,10 @@ config :phoenix_live_view,
   # Enable helpful, but potentially expensive runtime checks
   enable_expensive_runtime_checks: true
 
+# Widen Oban's stage interval in dev so periodic polls are less likely to
+# collide with Phoenix code reloading (which temporarily unloads app modules).
+# NOTE: not needed, but kept for reference
+# config :app, Oban, stage_interval: :infinity
+
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
