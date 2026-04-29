@@ -77,6 +77,7 @@ defmodule App.MixProject do
       {:dotenvy, "~> 1.1.0"},
       {:oban, "~> 2.18"},
       {:oban_web, "~> 2.11"},
+      {:multipart, "~> 0.6"},
 
       # Development and test packages
       {:tidewave, "~> 0.1", only: :dev},

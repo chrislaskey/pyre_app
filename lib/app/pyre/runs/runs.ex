@@ -34,7 +34,7 @@ defmodule App.Pyre.Runs do
           %{
             id: run.run_id,
             status: run.status,
-            feature: nil,
+            feature: run.feature,
             phase: nil,
             feature_description: run.description,
             started_at: run.started_at,
@@ -52,7 +52,8 @@ defmodule App.Pyre.Runs do
         run_id: run_id,
         description: description,
         workflow_type: workflow_type,
-        workflow_params: serialized_opts
+        workflow_params: serialized_opts,
+        feature: opts[:feature]
       })
 
     queue = workflow_queue_name(workflow_type)

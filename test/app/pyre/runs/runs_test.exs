@@ -128,6 +128,24 @@ defmodule App.Pyre.RunsTest do
       assert decoded["feature"] == "login-page"
     end
 
+    test "persists feature as a first-class column" do
+      opts = sample_opts(workflow: :feature, feature: "login-page")
+
+      assert {:ok, run} = Runs.create_and_enqueue("feat_col01", "Feature column test", opts)
+      assert run.feature == "login-page"
+
+      # Verify it survives a reload from the database
+      reloaded = Runs.get_by_run_id("feat_col01")
+      assert reloaded.feature == "login-page"
+    end
+
+    test "persists nil feature when not provided" do
+      opts = sample_opts(workflow: :chat, feature: nil)
+
+      assert {:ok, run} = Runs.create_and_enqueue("feat_col02", "No feature test", opts)
+      assert run.feature == nil
+    end
+
     test "rejects duplicate run_ids" do
       opts = sample_opts()
 

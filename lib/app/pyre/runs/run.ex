@@ -10,6 +10,7 @@ defmodule App.Pyre.Run do
     field :description, :string
     field :workflow_type, :string
     field :workflow_params, :string
+    field :feature, :string
     field :connection_id, :string
     field :oban_job_id, :integer
     field :error, :string
@@ -28,6 +29,7 @@ defmodule App.Pyre.Run do
       :description,
       :workflow_type,
       :workflow_params,
+      :feature,
       :connection_id,
       :oban_job_id,
       :error,

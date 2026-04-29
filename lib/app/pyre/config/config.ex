@@ -62,7 +62,7 @@ defmodule App.Pyre.Config do
            status: run.status,
            feature_description: run.description,
            workflow: String.to_atom(run.workflow_type),
-           feature: nil,
+           feature: run.feature,
            log: [],
            connection_id: run.connection_id,
            queued_at: run.inserted_at,

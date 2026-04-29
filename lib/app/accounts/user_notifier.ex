@@ -10,7 +10,7 @@ defmodule App.Accounts.UserNotifier do
     email =
       new()
       |> to(recipient)
-      |> from({"App", "contact@example.com"})
+      |> from(from_address())
       |> subject(subject)
       |> text_body(body)
 
@@ -107,5 +107,11 @@ defmodule App.Accounts.UserNotifier do
 
     ==============================
     """)
+  end
+
+  # Helpers
+
+  defp from_address do
+    Application.get_env(:app, App.Mailer)[:from] || raise "Missing :from in App.Mailer config"
   end
 end

@@ -34,6 +34,21 @@ end
 
 config :app, AppWeb.Endpoint, http: [port: env!("PORT", :integer, 4000)]
 
+config :app, App.Mailer, adapter: env!("SWOOSH_EMAIL_ADAPTER", :module, Swoosh.Adapters.Local)
+
+if env!("SWOOSH_EMAIL_API_KEY", :string, nil) do
+  config :app, App.Mailer, api_key: env!("SWOOSH_EMAIL_API_KEY", :string, nil)
+  config :swoosh, :api_client, Swoosh.ApiClient.Req
+end
+
+if env!("SWOOSH_EMAIL_DOMAIN", :string, nil) do
+  config :app, App.Mailer, domain: env!("SWOOSH_EMAIL_DOMAIN", :string, nil)
+end
+
+if env!("SWOOSH_EMAIL_FROM", :string, nil) do
+  config :app, App.Mailer, from: env!("SWOOSH_EMAIL_FROM", :string, nil)
+end
+
 # Pyre lib
 
 if env!("PYRE_GITHUB_REPO_URL", :string, nil) do
@@ -63,6 +78,10 @@ config :pyre, :github_apps, [
   end
 ]
 
+if tokens = env!("PYRE_WEBSOCKET_SERVICE_TOKENS_CSV", :string, nil) do
+  config :pyre, :websocket_service_tokens, tokens
+end
+
 # Pyre client
 
 config :pyre_client,
@@ -70,7 +89,8 @@ config :pyre_client,
   connection_id: env!("PYRE_CLIENT_CONNECTION_ID", :string, "local-worker"),
   connection_name: env!("PYRE_CLIENT_CONNECTION_NAME", :string, "local"),
   available_capacity: 1,
-  enabled_workflows: []
+  enabled_workflows: [],
+  service_token: env!("PYRE_CLIENT_WEBSOCKET_SERVICE_TOKEN", :string, nil)
 
 if paths = env!("PYRE_ALLOWED_PATHS", :string, nil) do
   config :pyre,

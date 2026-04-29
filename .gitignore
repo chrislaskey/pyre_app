@@ -50,3 +50,6 @@ lib/app/pyre/config/custom/*
 .claude
 .codex
 .cursor
+
+# Pyre runs
+priv/pyre/features/*

@@ -14,12 +14,16 @@ Then uncomment and update environmental variables to fit your use-case. Not all
 variables need to be used. Depending on the value, leaving it commented out
 will fallback to a default or disable a feature.
 
+To generate keys, run `mix pyre.gen.token` from the command line and then
+update `PYRE_WEBSOCKET_SERVICE_TOKENS_CSV` and `PYRE_CLIENT_WEBSOCKET_SERVICE_TOKEN` in `env/dev.env`.
+
 ## Quick start
 
 To start your Phoenix server:
 
 * Run `mix setup` to install and setup dependencies
 * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+* Configure the server `pyre_lib` and client `pyre_client`
 
 Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 

@@ -32,7 +32,7 @@ defmodule AppWeb.UserLive.Login do
          |> assign(form: to_form(%{"email" => email}, as: "user"))}
 
       user ->
-        Accounts.deliver_login_instructions(user)
+        {:ok, _} = Accounts.deliver_login_instructions(user)
 
         {:noreply,
          socket

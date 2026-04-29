@@ -80,6 +80,7 @@ defmodule App.Pyre.RunTest do
           description: "Build a login page",
           workflow_type: "feature",
           workflow_params: ~s({"workflow":"feature"}),
+          feature: "login-page",
           connection_id: "worker-1",
           oban_job_id: 42,
           error: "something went wrong",
@@ -89,6 +90,7 @@ defmodule App.Pyre.RunTest do
         })
 
       assert changeset.valid?
+      assert Ecto.Changeset.get_field(changeset, :feature) == "login-page"
     end
 
     test "enforces unique run_id constraint" do
