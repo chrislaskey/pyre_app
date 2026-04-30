@@ -85,7 +85,7 @@ end
 # Pyre client
 
 config :pyre_client,
-  server_url: "ws://localhost:#{env!("PORT", :string, "4000")}/websocket",
+  server_url: env!("PYRE_CLIENT_WEBSOCKET_URL", :string, "ws://localhost:#{env!("PORT", :string, "4000")}/websocket"),
   connection_id: env!("PYRE_CLIENT_CONNECTION_ID", :string, "local-worker"),
   connection_name: env!("PYRE_CLIENT_CONNECTION_NAME", :string, "local"),
   available_capacity: 1,
