@@ -86,11 +86,15 @@ end
 
 config :pyre_client,
   server_url: env!("PYRE_CLIENT_WEBSOCKET_URL", :string, "ws://localhost:#{env!("PORT", :string, "4000")}/websocket"),
+  service_token: env!("PYRE_CLIENT_WEBSOCKET_SERVICE_TOKEN", :string, nil),
   connection_id: env!("PYRE_CLIENT_CONNECTION_ID", :string, "local-worker"),
   connection_name: env!("PYRE_CLIENT_CONNECTION_NAME", :string, "local"),
-  available_capacity: 1,
-  enabled_workflows: [],
-  service_token: env!("PYRE_CLIENT_WEBSOCKET_SERVICE_TOKEN", :string, nil)
+  max_capacity: env!("PYRE_CLIENT_MAX_CAPACITY", :integer, "1"),
+  enabled_workflows: env!("PYRE_CLIENT_ENABLED_WORKFLOWS", fn csv ->
+    csv
+    |> String.split(",")
+    |> Enum.map(&String.trim/1)
+  end, [])
 
 if paths = env!("PYRE_ALLOWED_PATHS", :string, nil) do
   config :pyre,
