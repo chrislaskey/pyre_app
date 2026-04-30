@@ -70,8 +70,8 @@ defmodule App.MixProject do
       {:bandit, "~> 1.5"},
 
       # Pyre deps
-      {:pyre, path: "../pyre_lib"},
-      {:pyre_client, path: "../pyre_client"},
+      {:pyre, github: "chrislaskey/pyre_lib", branch: "main"},
+      {:pyre_client, github: "chrislaskey/pyre_client", branch: "main"},
 
       # Additional deps
       {:dotenvy, "~> 1.1.0"},
