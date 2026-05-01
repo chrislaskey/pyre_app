@@ -92,12 +92,12 @@ config :pyre_client,
   max_capacity: env!("PYRE_CLIENT_MAX_CAPACITY", :integer, "1"),
   enabled_workflows: env!("PYRE_CLIENT_ENABLED_WORKFLOWS", fn csv ->
     csv
-    |> String.split(",")
+    |> String.split(",", trim: true)
     |> Enum.map(&String.trim/1)
   end, [])
 
 if paths = env!("PYRE_ALLOWED_PATHS", :string, nil) do
-  config :pyre,
+  config :pyre_client,
     allowed_paths:
       paths
       |> String.split(",", trim: true)
