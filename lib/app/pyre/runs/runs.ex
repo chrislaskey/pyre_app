@@ -39,6 +39,7 @@ defmodule App.Pyre.Runs do
             phase: nil,
             feature_description: run.description,
             started_at: run.started_at,
+            completed_at: run.completed_at,
             queued_at: run.inserted_at
           }
       end
