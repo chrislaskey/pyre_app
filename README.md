@@ -33,7 +33,7 @@ Key environment variables are documented in `env/dev.env.example`. Notable:
 
 | Variable | Config key | Description |
 |----------|-----------|-------------|
-| `PYRE_ALLOWED_PATHS` | `config :pyre_client, :allowed_paths` | Comma-separated directories agents can access |
+| `PYRE_CLIENT_ALLOWED_PATHS` | `config :pyre_client, :allowed_paths` | Comma-separated directories agents can access |
 | `PYRE_WEBSOCKET_SERVICE_TOKENS_CSV` | `config :pyre, :websocket_service_tokens` | Server-side WebSocket auth tokens |
 | `PYRE_CLIENT_WEBSOCKET_SERVICE_TOKEN` | `config :pyre_client, :service_token` | Client-side WebSocket auth token |
 

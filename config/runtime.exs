@@ -96,7 +96,7 @@ config :pyre_client,
     |> Enum.map(&String.trim/1)
   end, [])
 
-if paths = env!("PYRE_ALLOWED_PATHS", :string, nil) do
+if paths = env!("PYRE_CLIENT_ALLOWED_PATHS", :string, nil) do
   config :pyre_client,
     allowed_paths:
       paths
