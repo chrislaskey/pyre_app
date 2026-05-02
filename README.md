@@ -27,6 +27,20 @@ To start your Phoenix server:
 
 Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
+## Configuration
+
+Key environment variables are documented in `env/dev.env.example`. Notable:
+
+| Variable | Config key | Description |
+|----------|-----------|-------------|
+| `PYRE_CLIENT_ALLOWED_PATHS` | `config :pyre_client, :allowed_paths` | Comma-separated directories agents can access |
+| `PYRE_WEBSOCKET_SERVICE_TOKENS_CSV` | `config :pyre, :websocket_service_tokens` | Server-side WebSocket auth tokens |
+| `PYRE_CLIENT_WEBSOCKET_SERVICE_TOKEN` | `config :pyre_client, :service_token` | Client-side WebSocket auth token |
+
+See [Pyre Client](https://github.com/chrislaskey/pyre_client) for client
+configuration details and [Pyre Lib](https://github.com/chrislaskey/pyre_lib)
+for server configuration details.
+
 ## Learn more about Pyre
 
 * Official repository: [https://github.com/chrislaskey/pyre](https://github.com/chrislaskey/pyre)
