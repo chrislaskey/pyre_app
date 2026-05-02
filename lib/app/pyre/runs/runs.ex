@@ -34,6 +34,7 @@ defmodule App.Pyre.Runs do
           %{
             id: run.run_id,
             status: run.status,
+            workflow: safe_to_atom(run.workflow_type),
             feature: run.feature,
             phase: nil,
             feature_description: run.description,
@@ -192,4 +193,7 @@ defmodule App.Pyre.Runs do
   """
   def workflow_queue_name(type) when is_atom(type), do: :"workflows_#{type}"
   def workflow_queue_name(type) when is_binary(type), do: :"workflows_#{type}"
+
+  defp safe_to_atom(nil), do: nil
+  defp safe_to_atom(str) when is_binary(str), do: String.to_existing_atom(str)
 end
